@@ -17,8 +17,8 @@ import (
 )
 
 type Config struct {
-	Port     int `yaml:"port"`
-	Auth     struct {
+	Port int `yaml:"port"`
+	Auth struct {
 		Enabled  bool   `yaml:"enabled"`
 		Username string `yaml:"username"`
 		Password string `yaml:"password"`
@@ -43,7 +43,7 @@ func NewLogStreamer(filepath string) (*LogStreamer, error) {
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
 		return nil, err
 	}
-	
+
 	return &LogStreamer{
 		clients:  make([]*websocket.Conn, 0),
 		filename: filepath,
@@ -54,7 +54,7 @@ func (ls *LogStreamer) AddClient(conn *websocket.Conn) {
 	ls.mutex.Lock()
 	ls.clients = append(ls.clients, conn)
 	ls.mutex.Unlock()
-	
+
 	// Send last 200 lines initially
 	go func() {
 		file, err := os.Open(ls.filename)
@@ -62,24 +62,24 @@ func (ls *LogStreamer) AddClient(conn *websocket.Conn) {
 			return
 		}
 		defer file.Close()
-		
+
 		// Read all lines first
 		var lines []string
 		scanner := bufio.NewScanner(file)
 		for scanner.Scan() {
 			lines = append(lines, scanner.Text())
 		}
-		
+
 		// Send last 200 lines
 		start := 0
 		if len(lines) > 200 {
 			start = len(lines) - 200
 		}
-		
+
 		for i := start; i < len(lines); i++ {
 			conn.WriteMessage(websocket.TextMessage, []byte(lines[i]))
 		}
-		
+
 		// Send initial line count
 		totalLines := len(lines)
 		shownLines := len(lines) - start
@@ -119,10 +119,10 @@ func (ls *LogStreamer) Start() {
 			return
 		}
 		defer file.Close()
-		
+
 		file.Seek(0, 2) // Go to end
 		scanner := bufio.NewScanner(file)
-		
+
 		for scanner.Scan() {
 			ls.Broadcast(scanner.Text())
 		}
@@ -138,7 +138,7 @@ func requireAuth(handler http.HandlerFunc) http.HandlerFunc {
 			handler(w, r)
 			return
 		}
-		
+
 		username, password, ok := r.BasicAuth()
 		if !ok || username != config.Auth.Username || password != config.Auth.Password {
 			w.Header().Set("WWW-Authenticate", `Basic realm="Loged"`)
@@ -159,7 +159,7 @@ h1 { color: #2196F3; }
 </html>`)
 			return
 		}
-		
+
 		handler(w, r)
 	}
 }
@@ -211,7 +211,7 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 			streamer.RemoveClient(conn)
 			break
 		}
-		
+
 		// Handle load more requests
 		if string(message) == "LOAD_MORE" {
 			go func() {
@@ -220,15 +220,15 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 				defer file.Close()
-				
+
 				var lines []string
 				scanner := bufio.NewScanner(file)
 				for scanner.Scan() {
 					lines = append(lines, scanner.Text())
 				}
-				
+
 				conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("__META__:LOAD_MORE_RESPONSE:%d", len(lines))))
-				
+
 				// Send 100 more lines from the requested position
 				// This will be handled by the frontend
 			}()
@@ -243,7 +243,7 @@ func handleLanding(w http.ResponseWriter, r *http.Request) {
 	if originalURI != "" && strings.HasPrefix(originalURI, "/loged") {
 		basePath = "/loged"
 	}
-	
+
 	w.Header().Set("Content-Type", "text/html")
 	fmt.Fprintf(w, `
 <!DOCTYPE html>
@@ -322,7 +322,7 @@ h1 {
         <h3>SSL Certificate Notice</h3>
         <p>This server uses a self-signed SSL certificate for secure connections.</p>
         <p>Your browser may show a security warning - this is normal and expected.</p>
-        <p>Click "Advanced" → "Proceed to site" to continue safely.</p>
+        <p>Click "Advanced" >> "Proceed to site" to continue safely.</p>
     </div>
     
     <button class="proceed-btn" onclick="proceedToApp()">Proceed to Log Viewer</button>
@@ -340,14 +340,14 @@ function proceedToApp() {
 func handleIndex(w http.ResponseWriter, r *http.Request) {
 	logPath := r.URL.Query().Get("file")
 	log.Printf("HTTP request for path: %s, file param: %s", r.URL.Path, logPath)
-	
+
 	// Get base path for URLs (detect if behind reverse proxy)
 	basePath := "/app"
 	originalURI := r.Header.Get("X-Original-URI")
 	if originalURI != "" && strings.HasPrefix(originalURI, "/loged") {
 		basePath = "/loged/app"
 	}
-	
+
 	if logPath == "" {
 		// Show available log files from config
 		w.Header().Set("Content-Type", "text/html")
@@ -464,7 +464,7 @@ h1 {
 <h1>Loged - Real-time Log Viewer</h1>
 <div class="section">
 <h3>Available Log Files</h3>`)
-		
+
 		hasFiles := false
 		for _, logFile := range config.LogFiles {
 			if _, err := os.Stat(logFile.Path); err == nil {
@@ -472,11 +472,11 @@ h1 {
 				hasFiles = true
 			}
 		}
-		
+
 		if !hasFiles {
 			fmt.Fprintf(w, `<div class="empty-state">No log files found. Check your config.yml or add a custom path below.</div>`)
 		}
-		
+
 		fmt.Fprintf(w, `</div>
 <div class="section">
 <h3>Custom Log File</h3>
@@ -499,7 +499,7 @@ h1 {
 
 	filename := filepath.Base(logPath)
 	log.Printf("Serving log viewer for file: %s", logPath)
-	
+
 	w.Header().Set("Content-Type", "text/html")
 	fmt.Fprintf(w, `
 <!DOCTYPE html>
@@ -772,35 +772,35 @@ func handleLoadMore(w http.ResponseWriter, r *http.Request) {
 	logPath := r.URL.Query().Get("file")
 	offsetStr := r.URL.Query().Get("offset")
 	limitStr := r.URL.Query().Get("limit")
-	
+
 	if logPath == "" {
 		http.Error(w, "file parameter required", http.StatusBadRequest)
 		return
 	}
-	
+
 	offset := 0
 	limit := 100
-	
+
 	if offsetStr != "" {
 		fmt.Sscanf(offsetStr, "%d", &offset)
 	}
 	if limitStr != "" {
 		fmt.Sscanf(limitStr, "%d", &limit)
 	}
-	
+
 	file, err := os.Open(logPath)
 	if err != nil {
 		http.Error(w, "Cannot open file", http.StatusInternalServerError)
 		return
 	}
 	defer file.Close()
-	
+
 	var lines []string
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
 	}
-	
+
 	// Calculate range
 	start := offset
 	if start < 0 {
@@ -810,20 +810,20 @@ func handleLoadMore(w http.ResponseWriter, r *http.Request) {
 	if end > len(lines) {
 		end = len(lines)
 	}
-	
+
 	var result []string
 	for i := start; i < end; i++ {
 		result = append(result, lines[i])
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	response := map[string]interface{}{
-		"lines": result,
-		"total": len(lines),
+		"lines":  result,
+		"total":  len(lines),
 		"offset": start,
-		"limit": limit,
+		"limit":  limit,
 	}
-	
+
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -854,6 +854,6 @@ func main() {
 		fmt.Printf("Authentication disabled\n")
 	}
 	fmt.Printf("Open http://localhost:%d in your browser\n", config.Port)
-	
+
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", config.Port), nil))
 }
