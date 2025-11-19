@@ -176,8 +176,8 @@ crontab -e
 
 ### Rate Limiting
 Automatic rate limiting is configured:
-- General endpoints: 30 requests/minute
-- API endpoints: 10 requests/minute
+- General endpoints: 60 requests/minute
+- API endpoints: 30 requests/minute
 - Burst protection included
 
 ### Accessing the Interface
@@ -232,6 +232,6 @@ catlog/
 ```
 ## Total Hours Spent on this Idea
 ```
-18
+20
 ```
 Update the counter like a message smeared on a wall with blood to let others know how much efforts have been made :)
