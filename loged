@@ -2,13 +2,18 @@
 
 set -e
 
-PIDFILE="loged.pid"
-LOGFILE="loged.log"
+RUNTIME_DIR="runtime"
+PIDFILE="$RUNTIME_DIR/loged.pid"
+LOGFILE="$RUNTIME_DIR/loged.log"
+BINARY="$RUNTIME_DIR/loged-server"
 
 # Function to install and build
 install_and_build() {
     echo "🚀 Loged - Lightweight Log Viewer Setup"
     echo "======================================="
+
+    # Create runtime directory
+    mkdir -p "$RUNTIME_DIR"
 
     # Check if Go is installed
     if ! command -v go &> /dev/null; then
@@ -50,10 +55,10 @@ install_and_build() {
 
     # Build the application
     echo "🔨 Building loged..."
-    cd src && go build -o ../loged-server main.go && cd ..
+    cd src && go build -o "../$BINARY" main.go && cd ..
 
     # Make it executable
-    chmod +x loged-server
+    chmod +x "$BINARY"
 
     echo "✅ Loged installed successfully!"
 }
@@ -61,7 +66,7 @@ install_and_build() {
 case "$1" in
     start)
         # Build if binary doesn't exist
-        if [ ! -f "loged-server" ]; then
+        if [ ! -f "$BINARY" ]; then
             install_and_build
         fi
         
@@ -77,7 +82,7 @@ case "$1" in
         fi
         
         echo "🎉 Starting Loged server..."
-        nohup ./loged-server > "$LOGFILE" 2>&1 &
+        nohup "./$BINARY" > "$LOGFILE" 2>&1 &
         PID=$!
         echo $PID > "$PIDFILE"
         
