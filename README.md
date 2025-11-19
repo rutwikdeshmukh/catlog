@@ -39,10 +39,10 @@ Catlog is an open-source, minimal log viewer that runs entirely on your server w
 
 ## Installation
 
-### One-Command Installation and Startup (Linux/macOS/WSL)
+### One-Command Installation and Startup for DEV (Linux/macOS/WSL)
 
 ```bash
-git clone https://github.com/rutwikdeshmukh/catlog && cd catlog && chmod +x catlog && ./catlog install  && ./catlog start
+git clone https://github.com/rutwikdeshmukh/catlog && cd catlog && chmod +x catlog && cp ./example.config.yml ./config.yml && ./catlog install  && ./catlog start
 ```
 
 This will automatically:
