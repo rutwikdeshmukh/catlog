@@ -254,8 +254,8 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 * { box-sizing: border-box; }
 body { 
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #1e1f29;
-    color: #f8f8f2;
+    background: #020617;
+    color: #94A3B8;
     margin: 0;
     padding: 0;
     min-height: 100vh;
@@ -264,16 +264,16 @@ body {
     justify-content: center;
 }
 .login-container {
-    background: #383a59;
+    background: #0F172A;
     padding: 40px;
     border-radius: 12px;
-    border: 1px solid #4f5374;
+    border: 1px solid #94A3B8;
     width: 100%%;
     max-width: 400px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.3);
 }
 h1 {
-    color: #bd93f9;
+    color: #A855F7;
     text-align: center;
     margin-bottom: 30px;
     font-size: 28px;
@@ -285,28 +285,28 @@ h1 {
 label {
     display: block;
     margin-bottom: 8px;
-    color: #8be9fd;
+    color: #2DD4BF;
     font-weight: 500;
 }
 input[type="text"], input[type="password"] {
     width: 100%%;
     padding: 12px 16px;
-    background: #1e1f29;
-    border: 1px solid #4f5374;
+    background: #020617;
+    border: 1px solid #94A3B8;
     border-radius: 6px;
-    color: #f8f8f2;
+    color: #94A3B8;
     font-size: 16px;
     transition: border-color 0.2s;
 }
 input[type="text"]:focus, input[type="password"]:focus {
     outline: none;
-    border-color: #8be9fd;
+    border-color: #2DD4BF;
 }
 .login-btn {
     width: 100%%;
     padding: 12px;
-    background: #50fa7b;
-    color: #1e1f29;
+    background: #2DD4BF;
+    color: #020617;
     border: none;
     border-radius: 6px;
     font-size: 16px;
@@ -315,11 +315,11 @@ input[type="text"]:focus, input[type="password"]:focus {
     transition: all 0.2s;
 }
 .login-btn:hover {
-    background: #5af78e;
+    background: #5EEAD4;
     transform: translateY(-1px);
 }
 .error {
-    background: #ff5555;
+    background: #EF4444;
     color: #fff;
     padding: 12px;
     border-radius: 6px;
@@ -388,8 +388,8 @@ input[type="text"]:focus, input[type="password"]:focus {
 * { box-sizing: border-box; }
 body { 
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #1e1f29;
-    color: #f8f8f2;
+    background: #020617;
+    color: #94A3B8;
     margin: 0;
     padding: 0;
     min-height: 100vh;
@@ -398,16 +398,16 @@ body {
     justify-content: center;
 }
 .login-container {
-    background: #383a59;
+    background: #0F172A;
     padding: 40px;
     border-radius: 12px;
-    border: 1px solid #4f5374;
+    border: 1px solid #94A3B8;
     width: 100%%;
     max-width: 400px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.3);
 }
 h1 {
-    color: #bd93f9;
+    color: #A855F7;
     text-align: center;
     margin-bottom: 30px;
     font-size: 28px;
@@ -419,28 +419,28 @@ h1 {
 label {
     display: block;
     margin-bottom: 8px;
-    color: #8be9fd;
+    color: #2DD4BF;
     font-weight: 500;
 }
 input[type="text"], input[type="password"] {
     width: 100%%;
     padding: 12px 16px;
-    background: #1e1f29;
-    border: 1px solid #4f5374;
+    background: #020617;
+    border: 1px solid #94A3B8;
     border-radius: 6px;
-    color: #f8f8f2;
+    color: #94A3B8;
     font-size: 16px;
     transition: border-color 0.2s;
 }
 input[type="text"]:focus, input[type="password"]:focus {
     outline: none;
-    border-color: #8be9fd;
+    border-color: #2DD4BF;
 }
 .login-btn {
     width: 100%%;
     padding: 12px;
-    background: #50fa7b;
-    color: #1e1f29;
+    background: #2DD4BF;
+    color: #020617;
     border: none;
     border-radius: 6px;
     font-size: 16px;
@@ -449,11 +449,11 @@ input[type="text"]:focus, input[type="password"]:focus {
     transition: all 0.2s;
 }
 .login-btn:hover {
-    background: #5af78e;
+    background: #5EEAD4;
     transform: translateY(-1px);
 }
 .error {
-    background: #ff5555;
+    background: #EF4444;
     color: #fff;
     padding: 12px;
     border-radius: 6px;
@@ -624,8 +624,8 @@ func handleLanding(w http.ResponseWriter, r *http.Request) {
 body { 
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
     margin: 0; padding: 0; 
-    background: #1e1f29;
-    color: #f8f8f2; 
+    background: #020617;
+    color: #94A3B8; 
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -637,7 +637,7 @@ body {
     text-align: center;
 }
 h1 { 
-    color: #bd93f9; 
+    color: #A855F7; 
     font-size: 48px; 
     font-weight: 700;
     margin-bottom: 20px;
@@ -649,7 +649,7 @@ h1 {
     line-height: 1.6;
 }
 .ssl-warning {
-    background: #383a59;
+    background: #0F172A;
     padding: 25px;
     border-radius: 8px;
     border-left: 4px solid #ffb86c;
@@ -662,13 +662,13 @@ h1 {
     font-size: 20px;
 }
 .ssl-warning p {
-    color: #f8f8f2;
+    color: #94A3B8;
     margin: 10px 0;
     line-height: 1.5;
 }
 .proceed-btn {
-    background: #50fa7b;
-    color: #1e1f29;
+    background: #2DD4BF;
+    color: #020617;
     border: none;
     padding: 15px 30px;
     border-radius: 8px;
@@ -678,7 +678,7 @@ h1 {
     transition: background 0.2s;
 }
 .proceed-btn:hover {
-    background: #8be9fd;
+    background: #2DD4BF;
 }
 </style>
 </head>
@@ -734,8 +734,8 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 body { 
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
     margin: 0; padding: 0; 
-    background: #1e1f29;
-    color: #f8f8f2; 
+    background: #020617;
+    color: #94A3B8; 
     min-height: 100vh;
 }
 .container { 
@@ -750,13 +750,13 @@ body {
     margin-bottom: 40px;
 }
 h1 { 
-    color: #bd93f9; 
+    color: #A855F7; 
     margin: 0; 
     font-size: 32px; 
     font-weight: 600;
 }
 .logout-btn {
-    background: #ff5555;
+    background: #EF4444;
     color: #fff;
     border: none;
     padding: 8px 16px;
@@ -766,18 +766,18 @@ h1 {
     transition: all 0.2s;
 }
 .logout-btn:hover {
-    background: #ff7979;
+    background: #F87171;
     transform: translateY(-1px);
 }
 .section { 
-    background: #383a59;
+    background: #0F172A;
     margin: 25px 0; 
     padding: 25px; 
     border-radius: 8px; 
-    border: 1px solid #4f5374;
+    border: 1px solid #94A3B8;
 }
 .section h3 { 
-    color: #50fa7b; 
+    color: #2DD4BF; 
     margin-top: 0; 
     font-size: 20px; 
     font-weight: 500;
@@ -786,16 +786,16 @@ h1 {
 .log-item { 
     margin: 15px 0; 
     padding: 15px; 
-    background: #1e1f29;
+    background: #020617;
     border-radius: 6px; 
-    border-left: 4px solid #8be9fd;
+    border-left: 4px solid #2DD4BF;
     transition: border-color 0.2s ease;
 }
 .log-item:hover { 
-    border-left-color: #50fa7b;
+    border-left-color: #2DD4BF;
 }
 .log-item a { 
-    color: #f8f8f2; 
+    color: #94A3B8; 
     text-decoration: none; 
     font-weight: 500; 
     font-size: 16px;
@@ -803,7 +803,7 @@ h1 {
     margin-bottom: 5px;
 }
 .log-item a:hover { 
-    color: #8be9fd;
+    color: #2DD4BF;
 }
 .log-item small { 
     color: #6272a4; 
@@ -820,20 +820,20 @@ h1 {
     padding: 12px 15px; 
     flex: 1; 
     min-width: 300px; 
-    background: #1e1f29; 
-    border: 1px solid #4f5374; 
+    background: #020617; 
+    border: 1px solid #94A3B8; 
     border-radius: 6px; 
-    color: #f8f8f2; 
+    color: #94A3B8; 
     font-size: 14px;
 }
 .custom-form input:focus { 
     outline: none; 
-    border-color: #bd93f9; 
+    border-color: #A855F7; 
     box-shadow: 0 0 0 2px rgba(189,147,249,0.2);
 }
 .custom-form button { 
     padding: 12px 20px; 
-    background: #bd93f9; 
+    background: #A855F7; 
     color: #282a36; 
     border: none; 
     border-radius: 6px; 
@@ -842,7 +842,7 @@ h1 {
     transition: background 0.2s;
 }
 .custom-form button:hover { 
-    background: #8be9fd;
+    background: #2DD4BF;
 }
 .empty-state { 
     text-align: center; 
@@ -924,14 +924,14 @@ function logout() {
 body { 
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
     margin: 0; padding: 0; 
-    background: #1e1f29;
-    color: #f8f8f2; 
+    background: #020617;
+    color: #94A3B8; 
     height: 100vh;
 }
 .header { 
-    background: #383a59;
+    background: #0F172A;
     padding: 20px 25px; 
-    border-bottom: 1px solid #4f5374;
+    border-bottom: 1px solid #94A3B8;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -942,8 +942,8 @@ body {
     gap: 15px;
 }
 .back-link { 
-    color: #1e1f29;
-    background: #8be9fd;
+    color: #020617;
+    background: #2DD4BF;
     text-decoration: none; 
     padding: 8px 16px;
     border-radius: 6px;
@@ -951,11 +951,11 @@ body {
     transition: all 0.2s;
 }
 .back-link:hover { 
-    background: #50fa7b;
+    background: #2DD4BF;
     transform: translateY(-1px);
 }
 .logout-btn {
-    background: #ff5555;
+    background: #EF4444;
     color: #fff;
     border: none;
     padding: 8px 16px;
@@ -965,11 +965,11 @@ body {
     transition: all 0.2s;
 }
 .logout-btn:hover {
-    background: #ff7979;
+    background: #F87171;
     transform: translateY(-1px);
 }
 h1 { 
-    color: #bd93f9; 
+    color: #A855F7; 
     margin: 0; 
     display: inline-block; 
     font-size: 24px;
@@ -980,10 +980,10 @@ h1 {
     margin: 10px 0 0 0; 
     font-size: 14px;
     padding: 8px 12px;
-    background: #1e1f29;
+    background: #020617;
     border-radius: 4px;
     display: inline-block;
-    border: 1px solid #383a59;
+    border: 1px solid #0F172A;
 }
 .container { 
     padding: 20px; 
@@ -997,9 +997,9 @@ h1 {
     align-items: center;
     gap: 15px;
     padding: 15px;
-    background: #383a59;
+    background: #0F172A;
     border-radius: 6px;
-    border: 1px solid #4f5374;
+    border: 1px solid #94A3B8;
 }
 #loadMoreBtn {
     background: #ff79c6;
@@ -1018,18 +1018,18 @@ h1 {
 #loadMoreBtn:disabled { 
     background: #6272a4;
     cursor: not-allowed;
-    color: #f8f8f2;
+    color: #94A3B8;
 }
 .log-info {
     color: #6272a4;
     font-size: 14px;
 }
 #logs { 
-    background: #1e1f29;
+    background: #020617;
     padding: 15px; 
     flex: 1; 
     overflow-y: auto; 
-    border: 1px solid #383a59; 
+    border: 1px solid #0F172A; 
     border-radius: 6px;
     font-size: 13px;
     line-height: 1.5;
@@ -1042,7 +1042,7 @@ h1 {
     transition: background 0.2s;
 }
 .log-line:hover {
-    background: #383a59;
+    background: #0F172A;
 }
 .log-line.new {
     background: rgba(80,250,123,0.2);
@@ -1053,9 +1053,9 @@ h1 {
     100%% { background: transparent; }
 }
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #383a59; }
+::-webkit-scrollbar-track { background: #0F172A; }
 ::-webkit-scrollbar-thumb { 
-    background: #4f5374; 
+    background: #94A3B8; 
     border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover { 
@@ -1125,7 +1125,7 @@ ws.onmessage = function(event) {
     
     // Highlight error keywords
     let content = data;
-    content = content.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #ff5555; font-weight: bold;">$1</span>');
+    content = content.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #EF4444; font-weight: bold;">$1</span>');
     line.innerHTML = content;
     
     // If it's a new real-time log (not from load more)
@@ -1138,7 +1138,7 @@ ws.onmessage = function(event) {
     } else {
         // Historical line from load more
         const originalContent = data.substring('__HISTORICAL__:'.length);
-        let highlightedContent = originalContent.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #ff5555; font-weight: bold;">$1</span>');
+        let highlightedContent = originalContent.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #EF4444; font-weight: bold;">$1</span>');
         line.innerHTML = highlightedContent;
         line.classList.remove('new');
         logs.insertBefore(line, logs.firstChild);
@@ -1180,7 +1180,7 @@ function loadMore() {
                 const line = document.createElement('div');
                 line.className = 'log-line';
                 // Highlight error keywords
-                const highlightedText = lineText.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #ff5555; font-weight: bold;">$1</span>');
+                const highlightedText = lineText.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #EF4444; font-weight: bold;">$1</span>');
                 line.innerHTML = highlightedText;
                 logs.insertBefore(line, logs.firstChild);
             });
