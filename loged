@@ -100,6 +100,7 @@ install_and_build() {
         echo "📍 Detected public IP: $PUBLIC_IP"
         
         # Generate SSL certificate if it doesn't exist
+        SSL_GENERATED=false
         if [ ! -f "/etc/ssl/certs/loged.crt" ]; then
             echo "🔒 Generating SSL certificate..."
             sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
@@ -109,6 +110,7 @@ install_and_build() {
             
             sudo chmod 600 /etc/ssl/private/loged.key
             sudo chmod 644 /etc/ssl/certs/loged.crt
+            SSL_GENERATED=true
             echo "✅ SSL certificate generated"
         else
             echo "✅ SSL certificate already exists"
@@ -120,7 +122,13 @@ install_and_build() {
         rm /tmp/loged-nginx-configured
         
         sudo ln -sf /etc/nginx/sites-available/loged /etc/nginx/sites-enabled/loged
-        sudo nginx -s reload 2>/dev/null || sudo systemctl reload nginx 2>/dev/null || echo "⚠️  Please reload nginx manually"
+        
+        # Restart nginx only if SSL was newly generated, otherwise just reload
+        if [ "$SSL_GENERATED" = true ]; then
+            sudo systemctl restart nginx 2>/dev/null || sudo service nginx restart 2>/dev/null || sudo nginx -s reload 2>/dev/null || echo "⚠️  Please restart nginx manually"
+        else
+            sudo nginx -s reload 2>/dev/null || sudo systemctl reload nginx 2>/dev/null || echo "⚠️  Please reload nginx manually"
+        fi
         echo "✅ Nginx reverse proxy configured with SSL"
         echo "📍 Access via: https://$PUBLIC_IP/loged"
         echo "⚠️  Browser will show security warning - click 'Advanced' → 'Proceed'"
