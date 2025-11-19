@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/gorilla/websocket"
@@ -241,8 +242,8 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 	
 	// Get base path for URLs (detect if behind reverse proxy)
 	basePath := ""
-	if r.Header.Get("X-Forwarded-For") != "" {
-		basePath = "/loaded"
+	if strings.HasPrefix(r.RequestURI, "/loged") {
+		basePath = "/loged"
 	}
 	
 	if logPath == "" {

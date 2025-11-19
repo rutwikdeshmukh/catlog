@@ -2,7 +2,7 @@ server {
     listen 80;
     server_name loged.logs;
 
-    location /loaded {
+    location /loged {
         proxy_pass http://127.0.0.1:8008;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -14,8 +14,8 @@ server {
         proxy_cache_bypass $http_upgrade;
         proxy_read_timeout 86400;
         
-        # Remove /loaded prefix when forwarding to backend
-        rewrite ^/loaded/(.*) /$1 break;
-        rewrite ^/loaded$ / break;
+        # Remove /loged prefix when forwarding to backend
+        rewrite ^/loged/(.*) /$1 break;
+        rewrite ^/loged$ / break;
     }
 }
