@@ -208,6 +208,31 @@ Automatic rate limiting is configured:
 4. **Firewall Rules** - Limit access to specific IPs
 5. **Run as Dedicated User** with minimal permissions
 
+## Resource Utilization
+
+### CPU & Memory Usage
+
+#### **Installation (`./catlog install`)**
+- **CPU**: 50-80% of total system capacity for 30-60 seconds (Parallel Compilation Behavior: Go uses multiple/all available cores automatically)
+  - Single vCPU: 80-100% of that core (60-120 seconds)
+  - Multi-vCPU: Distributed across cores (30-60 seconds)
+- **Memory**: 200-500MB peak during Go compilation
+
+#### **Runtime (`./catlog start`)**
+- **CPU**: 1-5% continuous during active log streaming
+- **Memory**: 20-35MB steady state (Single User)
+- **Idle**: <1% CPU, 20-25MB memory
+
+#### **Updates (`./catlog update`)**
+- **CPU**: 40-70% for 45-90 seconds (Rebuild Process)
+- **Memory**: 200-400MB peak
+
+### Resource Efficiency
+- **Lightweight**: Single Go binary (~5-10MB)
+- **No database**: Minimal Dependencies
+- **Scalable**: Memory usage scales with active connections
+- **VPS friendly**: Suitable for small instances (1GB RAM+)
+
 ## File Structure
 
 ```
