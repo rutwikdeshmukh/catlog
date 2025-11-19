@@ -40,7 +40,7 @@ Loged is an open-source, minimal log viewer that runs entirely on your server wi
 ### One-Command Installation (Linux/macOS/WSL)
 
 ```bash
-git clone <repo-url> && cd loged && ./loged
+git clone <repo-url> && cd loged && chmod +x loged && ./loged
 ```
 
 This will automatically:
@@ -57,6 +57,7 @@ This will automatically:
    ```bash
    git clone <repo-url>
    cd loged
+   chmod +x loged
    ./loged install
    ```
 
@@ -128,7 +129,7 @@ log_files:
    127.0.0.1 loged.logs
    ```
 
-2. **Access via:** `http://loged.logs/loaded`
+2. **Access via:** `http://loged.logs/loged`
 
 ### Using the Interface
 
@@ -158,8 +159,8 @@ http://localhost:8008?file=/var/log/nginx/access.log
 
 **Via nginx proxy:**
 ```
-http://loged.logs/loaded?file=/var/log/syslog
-http://loged.logs/loaded?file=/var/log/nginx/access.log
+http://loged.logs/loged?file=/var/log/syslog
+http://loged.logs/loged?file=/var/log/nginx/access.log
 ```
 
 ### Command Line Options

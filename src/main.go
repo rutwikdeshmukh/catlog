@@ -517,7 +517,9 @@ h1 {
 <script>
 console.log('Connecting to WebSocket...');
 const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-const ws = new WebSocket(wsProtocol + '//' + location.host + '%s/ws?file=%s');
+const basePath = '%s';
+const wsPath = basePath ? basePath + '/ws' : '/ws';
+const ws = new WebSocket(wsProtocol + '//' + location.host + wsPath + '?file=%s');
 const logs = document.getElementById('logs');
 const status = document.getElementById('status');
 const loadMoreBtn = document.getElementById('loadMoreBtn');
@@ -596,7 +598,8 @@ function loadMore() {
     loadMoreBtn.textContent = 'Loading...';
     
     // Request more lines from server
-    fetch('%s/api/loadmore?file=%s&offset=' + (totalLines - shownLines - 100) + '&limit=100')
+    const apiPath = basePath ? basePath + '/api/loadmore' : '/api/loadmore';
+    fetch(apiPath + '?file=%s&offset=' + (totalLines - shownLines - 100) + '&limit=100')
         .then(response => response.json())
         .then(data => {
             const scrollPos = logs.scrollTop;
@@ -631,7 +634,7 @@ function updateLogInfo() {
 }
 </script>
 </body>
-</html>`, filename, basePath, filename, basePath, logPath, basePath, logPath)
+</html>`, filename, basePath, filename, basePath, logPath, logPath)
 }
 
 func handleLoadMore(w http.ResponseWriter, r *http.Request) {
