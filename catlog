@@ -151,8 +151,8 @@ install_and_build() {
         
         # Check if crontab entry already exists
         if ! crontab -l 2>/dev/null | grep -q "catlog restart"; then
-            # Add crontab entry for auto-start
-            (crontab -l 2>/dev/null; echo "@reboot sleep 60 && cd $CURRENT_DIR && ./catlog restart") | crontab -
+            # Add crontab entry for auto-start (handle empty crontab)
+            { crontab -l 2>/dev/null || true; echo "@reboot sleep 60 && cd $CURRENT_DIR && ./catlog restart"; } | crontab -
             echo "✅ Auto-start configured - catlog will restart automatically on server reboot"
         else
             echo "✅ Auto-start already configured"
@@ -360,7 +360,7 @@ case "$1" in
         if [[ "$OSTYPE" == "linux-gnu"* ]]; then
             echo "⏰ Removing auto-start configuration..."
             if crontab -l 2>/dev/null | grep -q "catlog restart"; then
-                crontab -l 2>/dev/null | grep -v "catlog restart" | crontab -
+                { crontab -l 2>/dev/null || true; } | grep -v "catlog restart" | crontab -
                 echo "✅ Auto-start configuration removed"
             fi
         fi
