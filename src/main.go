@@ -342,10 +342,10 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 	log.Printf("HTTP request for path: %s, file param: %s", r.URL.Path, logPath)
 	
 	// Get base path for URLs (detect if behind reverse proxy)
-	basePath := ""
+	basePath := "/app"
 	originalURI := r.Header.Get("X-Original-URI")
 	if originalURI != "" && strings.HasPrefix(originalURI, "/loged") {
-		basePath = "/loged"
+		basePath = "/loged/app"
 	}
 	
 	if logPath == "" {
