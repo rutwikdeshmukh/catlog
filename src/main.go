@@ -242,7 +242,8 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 	
 	// Get base path for URLs (detect if behind reverse proxy)
 	basePath := ""
-	if strings.HasPrefix(r.RequestURI, "/loged") {
+	originalURI := r.Header.Get("X-Original-URI")
+	if originalURI != "" && strings.HasPrefix(originalURI, "/loged") {
 		basePath = "/loged"
 	}
 	

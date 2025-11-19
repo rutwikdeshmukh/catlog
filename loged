@@ -196,6 +196,18 @@ case "$1" in
         
         sleep 2
         install_and_build
+        
+        # Always update nginx config if on Linux
+        if [[ "$OSTYPE" == "linux-gnu"* ]] && command -v nginx &> /dev/null; then
+            echo "🌐 Updating nginx configuration..."
+            sudo cp loged-nginx /etc/nginx/sites-available/loged
+            if [ ! -L /etc/nginx/sites-enabled/loged ]; then
+                sudo ln -s /etc/nginx/sites-available/loged /etc/nginx/sites-enabled/loged
+            fi
+            sudo nginx -s reload 2>/dev/null || sudo systemctl reload nginx 2>/dev/null || echo "⚠️  Please reload nginx manually"
+            echo "✅ Nginx configuration updated"
+        fi
+        
         echo ""
         echo "🚀 Starting updated server..."
         $0 start
