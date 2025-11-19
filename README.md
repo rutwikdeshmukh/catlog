@@ -20,6 +20,7 @@ Loged is an open-source, minimal log viewer that runs entirely on your server wi
 - **Basic authentication** - secure access with username/password
 - **Pagination** - loads last 200 lines by default, load more on demand
 - **Nginx reverse proxy** - automatic setup with SSL-ready configuration
+- **SSL landing page** - explains SSL setup before authentication
 
 ### Target Audience
 - Developers and DevOps engineers needing quick log visibility
@@ -82,6 +83,7 @@ This will automatically:
 ./loged stop       # Stop server
 ./loged status     # Check if server is running
 ./loged update     # Stop, rebuild, and restart server
+./loged uninstall  # Remove all loged files and configurations
 ```
 
 ### Configuration
@@ -138,22 +140,30 @@ log_files:
    <your-server-ip> <your-domain.com>
    ```
 
-2. **Access via:** `http://<your-domain.com>/loged`
+2. **Visit landing page:** `http://<your-domain.com>/loged`
+3. **Click "Proceed to Log Viewer"** (redirects to HTTPS)
+4. **Accept SSL certificate** (browser security warning)
+5. **Enter credentials** when prompted
 
 ### Using the Interface
 
-1. **Login with credentials** (if authentication is enabled)
+1. **Visit landing page** (explains SSL setup)
 
-2. **Select log files:**
+2. **Proceed to secure viewer** (HTTPS with authentication)
+
+3. **Login with credentials** from config.yml
+
+4. **Select log files:**
    - Choose from configured log files on the homepage
    - Or enter a custom log file path
    - Each log file opens in its own view
 
-3. **Real-time monitoring:**
+5. **Real-time monitoring:**
    - Logs stream in real-time as new lines are appended
    - Shows last 200 lines by default
    - Click "Load 100 More Lines" to see older entries
    - Auto-scroll keeps latest entries visible
+   - Error keywords highlighted in red
    - Open multiple tabs for different log files
 
 ### Direct URL Access
