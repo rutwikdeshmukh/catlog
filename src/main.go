@@ -241,6 +241,10 @@ func requireAuth(handler http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
+func handleLogo(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "logo.png")
+}
+
 func handleLogin(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		// Show login form
@@ -250,6 +254,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 <html>
 <head>
 <title>Catlog - Login</title>
+<link rel="icon" type="image/png" href="/logo.png">
 <style>
 * { box-sizing: border-box; }
 body { 
@@ -330,6 +335,9 @@ input[type="text"]:focus, input[type="password"]:focus {
 </head>
 <body>
 <div class="login-container">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <img src="/logo.png" alt="Catlog" style="height: 48px; width: auto;">
+    </div>
     <h1>catlog</h1>
     <form method="POST">
         <div class="form-group">
@@ -384,6 +392,7 @@ input[type="text"]:focus, input[type="password"]:focus {
 <html>
 <head>
 <title>Catlog - Login</title>
+<link rel="icon" type="image/png" href="/logo.png">
 <style>
 * { box-sizing: border-box; }
 body { 
@@ -464,6 +473,9 @@ input[type="text"]:focus, input[type="password"]:focus {
 </head>
 <body>
 <div class="login-container">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <img src="/logo.png" alt="Catlog" style="height: 48px; width: auto;">
+    </div>
     <h1>catlog</h1>
     <div class="error">Invalid username or password</div>
     <form method="POST">
@@ -619,6 +631,8 @@ func handleLanding(w http.ResponseWriter, r *http.Request) {
 <html>
 <head>
 <title>Catlog - Real-time Log Viewer</title>
+<link rel="icon" type="image/png" href="/logo.png">
+<link rel="icon" type="image/png" href="/logo.png">
 <style>
 * { box-sizing: border-box; }
 body { 
@@ -684,6 +698,9 @@ h1 {
 </head>
 <body>
 <div class="container">
+    <div style="text-align: center; margin-bottom: 20px;">
+        <img src="/logo.png" alt="Catlog" style="height: 64px; width: auto;">
+    </div>
     <h1>catlog</h1>
     <p class="subtitle">Real-time log streaming for your server - monitor log files instantly through your browser</p>
     
@@ -855,7 +872,10 @@ h1 {
 <body>
 <div class="container">
 <div class="header-main">
+<div style="display: flex; align-items: center; gap: 15px;">
+<img src="/logo.png" alt="Catlog" style="height: 32px; width: auto;">
 <h1>Catlog - Real-time Log Viewer</h1>
+</div>
 <button class="logout-btn" onclick="logout()">Logout</button>
 </div>
 <div class="section">
@@ -919,6 +939,7 @@ function logout() {
 <html>
 <head>
 <title>%s - Catlog</title>
+<link rel="icon" type="image/png" href="/logo.png">
 <style>
 * { box-sizing: border-box; }
 body { 
@@ -1065,8 +1086,11 @@ h1 {
 </head>
 <body>
 <div class="header">
-    <a href="%s" class="back-link">Back to Log List</a>
-    <h1>%s</h1>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <a href="%s" class="back-link">Back to Log List</a>
+        <img src="/logo.png" alt="Catlog" style="height: 24px; width: auto;">
+        <h1>%s</h1>
+    </div>
     <div class="header-right">
         <div id="status">Connecting...</div>
         <button class="logout-btn" onclick="logout()">Logout</button>
@@ -1297,6 +1321,7 @@ func main() {
 	}
 
 	http.HandleFunc("/", handleLanding)
+	http.HandleFunc("/logo.png", handleLogo)
 	http.HandleFunc("/login", handleLogin)
 	http.HandleFunc("/logout", handleLogout)
 	http.HandleFunc("/app", requireAuth(handleIndex))

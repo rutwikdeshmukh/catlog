@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="src/logo.png" alt="Catlog Logo" width="120" height="120">
+</div>
+
 # catlog
 
 A lightweight, real-time log streaming tool for Linux servers built with AI.
