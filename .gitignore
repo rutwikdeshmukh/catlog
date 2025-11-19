@@ -5,12 +5,12 @@ runtime/
 config.yml
 
 # Legacy runtime files (in case they exist)
-loged-server
-loged.pid
-loged.log
+catlog-server
+catlog.pid
+catlog.log
 
 # Go build artifacts
-src/loged-server
+src/catlog-server
 
 # OS files
 .DS_Store

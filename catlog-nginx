@@ -11,10 +11,10 @@ server {
     listen 80;
     server_name SERVER_IP;
 
-    access_log /var/log/nginx/loged_access.log ist_format;
+    access_log /var/log/nginx/catlog_access.log ist_format;
 
     # Serve landing page on HTTP
-    location /loged {
+    location /catlog {
         limit_req zone=general burst=10 nodelay;
         proxy_pass http://127.0.0.1:8008;
         proxy_http_version 1.1;
@@ -24,9 +24,9 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header X-Original-URI $request_uri;
         
-        # Remove /loged prefix when forwarding to backend
-        rewrite ^/loged/(.*) /$1 break;
-        rewrite ^/loged$ / break;
+        # Remove /catlog prefix when forwarding to backend
+        rewrite ^/catlog/(.*) /$1 break;
+        rewrite ^/catlog$ / break;
     }
 
     # Handle login and logout routes
@@ -60,10 +60,10 @@ server {
     listen 443 ssl;
     server_name SERVER_IP;
 
-    access_log /var/log/nginx/loged_ssl_access.log ist_format;
+    access_log /var/log/nginx/catlog_ssl_access.log ist_format;
 
-    ssl_certificate /etc/ssl/certs/loged.crt;
-    ssl_certificate_key /etc/ssl/private/loged.key;
+    ssl_certificate /etc/ssl/certs/catlog.crt;
+    ssl_certificate_key /etc/ssl/private/catlog.key;
     
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
@@ -84,7 +84,7 @@ server {
         proxy_read_timeout 86400;
     }
 
-    location /loged {
+    location /catlog {
         limit_req zone=general burst=10 nodelay;
         proxy_pass http://127.0.0.1:8008;
         proxy_http_version 1.1;
@@ -98,9 +98,9 @@ server {
         proxy_cache_bypass $http_upgrade;
         proxy_read_timeout 86400;
         
-        # Remove /loged prefix when forwarding to backend
-        rewrite ^/loged/(.*) /$1 break;
-        rewrite ^/loged$ / break;
+        # Remove /catlog prefix when forwarding to backend
+        rewrite ^/catlog/(.*) /$1 break;
+        rewrite ^/catlog$ / break;
     }
 
     # Redirect root to HTTP for landing page

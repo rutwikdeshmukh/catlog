@@ -249,7 +249,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 <!DOCTYPE html>
 <html>
 <head>
-<title>Loged - Login</title>
+<title>Catlog - Login</title>
 <style>
 * { box-sizing: border-box; }
 body { 
@@ -330,7 +330,7 @@ input[type="text"]:focus, input[type="password"]:focus {
 </head>
 <body>
 <div class="login-container">
-    <h1>loged</h1>
+    <h1>catlog</h1>
     <form method="POST">
         <div class="form-group">
             <label for="username">Username</label>
@@ -383,7 +383,7 @@ input[type="text"]:focus, input[type="password"]:focus {
 <!DOCTYPE html>
 <html>
 <head>
-<title>Loged - Login</title>
+<title>Catlog - Login</title>
 <style>
 * { box-sizing: border-box; }
 body { 
@@ -464,7 +464,7 @@ input[type="text"]:focus, input[type="password"]:focus {
 </head>
 <body>
 <div class="login-container">
-    <h1>loged</h1>
+    <h1>catlog</h1>
     <div class="error">Invalid username or password</div>
     <form method="POST">
         <div class="form-group">
@@ -609,8 +609,8 @@ func handleLanding(w http.ResponseWriter, r *http.Request) {
 	// Get base path for URLs (detect if behind reverse proxy)
 	basePath := ""
 	originalURI := r.Header.Get("X-Original-URI")
-	if originalURI != "" && strings.HasPrefix(originalURI, "/loged") {
-		basePath = "/loged"
+	if originalURI != "" && strings.HasPrefix(originalURI, "/catlog") {
+		basePath = "/catlog"
 	}
 
 	w.Header().Set("Content-Type", "text/html")
@@ -618,7 +618,7 @@ func handleLanding(w http.ResponseWriter, r *http.Request) {
 <!DOCTYPE html>
 <html>
 <head>
-<title>Loged - Real-time Log Viewer</title>
+<title>Catlog - Real-time Log Viewer</title>
 <style>
 * { box-sizing: border-box; }
 body { 
@@ -684,7 +684,7 @@ h1 {
 </head>
 <body>
 <div class="container">
-    <h1>loged</h1>
+    <h1>catlog</h1>
     <p class="subtitle">Real-time log streaming for your server - monitor log files instantly through your browser</p>
     
     <div class="ssl-warning">
@@ -718,8 +718,8 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 	// Get base path for URLs (detect if behind reverse proxy)
 	basePath := "/app"
 	originalURI := r.Header.Get("X-Original-URI")
-	if originalURI != "" && strings.HasPrefix(originalURI, "/loged") {
-		basePath = "/loged/app"
+	if originalURI != "" && strings.HasPrefix(originalURI, "/catlog") {
+		basePath = "/catlog/app"
 	}
 
 	if logPath == "" {
@@ -728,7 +728,7 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `
 <!DOCTYPE html>
 <html>
-<head><title>Loged - Log Viewer</title>
+<head><title>Catlog - Log Viewer</title>
 <style>
 * { box-sizing: border-box; }
 body { 
@@ -855,7 +855,7 @@ h1 {
 <body>
 <div class="container">
 <div class="header-main">
-<h1>Loged - Real-time Log Viewer</h1>
+<h1>Catlog - Real-time Log Viewer</h1>
 <button class="logout-btn" onclick="logout()">Logout</button>
 </div>
 <div class="section">
@@ -918,7 +918,7 @@ function logout() {
 <!DOCTYPE html>
 <html>
 <head>
-<title>%s - Loged</title>
+<title>%s - Catlog</title>
 <style>
 * { box-sizing: border-box; }
 body { 
@@ -1084,7 +1084,7 @@ console.log('Connecting to WebSocket...');
 const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
 const basePath = '%s';
 // WebSocket endpoint is always /ws, not /app/ws
-const wsPath = basePath && basePath.includes('/loged') ? '/loged/ws' : '/ws';
+const wsPath = basePath && basePath.includes('/catlog') ? '/catlog/ws' : '/ws';
 const ws = new WebSocket(wsProtocol + '//' + location.host + wsPath + '?file=%s');
 const logs = document.getElementById('logs');
 const status = document.getElementById('status');
@@ -1169,7 +1169,7 @@ function loadMore() {
     loadMoreBtn.textContent = 'Loading...';
     
     // Request more lines from server
-    const apiPath = basePath && basePath.includes('/loged') ? '/loged/api/loadmore' : '/api/loadmore';
+    const apiPath = basePath && basePath.includes('/catlog') ? '/catlog/api/loadmore' : '/api/loadmore';
     fetch(apiPath + '?file=%s&offset=' + (totalLines - shownLines - 100) + '&limit=100')
         .then(response => response.json())
         .then(data => {
@@ -1303,7 +1303,7 @@ func main() {
 	http.HandleFunc("/ws", requireAuth(handleWebSocket))
 	http.HandleFunc("/api/loadmore", requireAuth(handleLoadMore))
 
-	fmt.Printf("Loged server starting on port %d\n", config.Port)
+	fmt.Printf("Catlog server starting on port %d\n", config.Port)
 	if config.Auth.Enabled {
 		fmt.Printf("Authentication enabled - %d users configured\n", len(config.Auth.Users))
 		for _, user := range config.Auth.Users {

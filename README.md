@@ -1,10 +1,10 @@
-# loged
+# catlog
 
 A lightweight, real-time log streaming tool for Linux servers built with AI.
 
 ## About
 
-Loged is an open-source, minimal log viewer that runs entirely on your server without requiring external backends or databases. It provides a web-based interface for monitoring log files in real-time, accessible from any browser.
+Catlog is an open-source, minimal log viewer that runs entirely on your server without requiring external backends or databases. It provides a web-based interface for monitoring log files in real-time, accessible from any browser.
 
 ### Features
 - **Real-Time Log Streaming** via Secure WebSocket Connections
@@ -37,7 +37,7 @@ Loged is an open-source, minimal log viewer that runs entirely on your server wi
 ### One-Command Installation and Startup (Linux/macOS/WSL)
 
 ```bash
-git clone https://github.com/rutwikdeshmukh/loged && cd loged && chmod +x loged && ./loged install  && ./loged start
+git clone https://github.com/rutwikdeshmukh/catlog && cd catlog && chmod +x catlog && ./catlog install  && ./catlog start
 ```
 
 This will automatically:
@@ -53,10 +53,10 @@ This will automatically:
 1. **Install Go 1.21+** from https://golang.org/dl/
 2. **Run:**
    ```bash
-   git clone https://github.com/rutwikdeshmukh/loged
-   cd loged
-   chmod +x loged
-   ./loged install
+   git clone https://github.com/rutwikdeshmukh/catlog
+   cd catlog
+   chmod +x catlog
+   ./catlog install
    ```
 
 <!-- ### Windows Installation
@@ -64,10 +64,10 @@ This will automatically:
 1. **Install Go** from https://golang.org/dl/ (download the .msi installer)
 2. **Clone and build:**
    ```bash
-   git clone https://github.com/rutwikdeshmukh/loged
-   cd loged
+   git clone https://github.com/rutwikdeshmukh/catlog
+   cd catlog
    go mod tidy
-   go build -o runtime/loged-server.exe src/main.go
+   go build -o runtime/catlog-server.exe src/main.go
    ``` -->
 
 ## Usage
@@ -75,12 +75,12 @@ This will automatically:
 ### Commands
 
 ```bash
-./loged install    # Install dependencies and build (one-time setup)
-./loged start      # Start server in background
-./loged stop       # Stop server
-./loged status     # Check if server is running
-./loged update     # Stop, rebuild, and restart server
-./loged uninstall  # Remove all loged files and configurations
+./catlog install    # Install dependencies and build (one-time setup)
+./catlog start      # Start server in background
+./catlog stop       # Stop server
+./catlog status     # Check if server is running
+./catlog update     # Stop, rebuild, and restart server
+./catlog uninstall  # Remove all catlog files and configurations
 ```
 
 ### Configuration
@@ -93,13 +93,13 @@ port: 8008
 timezone: "Asia/Kolkata"  # IST timezone for logs and timestamps
 ssl:
   enabled: true
-  cert_path: "/etc/ssl/certs/loged.crt"
-  key_path: "/etc/ssl/private/loged.key"
+  cert_path: "/etc/ssl/certs/catlog.crt"
+  key_path: "/etc/ssl/private/catlog.key"
 auth:
   enabled: true
   users:
     - username: "admin"
-      password: "loged123"
+      password: "catlog123"
       role: "admin"  # admin has access to all logs
     - username: "BEDeveloper"
       password: "backend123"
@@ -107,7 +107,7 @@ auth:
       allowed_paths:
         - "/var/log/supervisor/*"
         - "/var/log/app/*"
-        - "./runtime/loged.log"
+        - "./runtime/catlog.log"
     - username: "FEDeveloper"
       password: "frontend123"
       role: "frontend"
@@ -127,13 +127,13 @@ log_files:
   - name: "System Log"
     path: "/var/log/syslog"
   - name: "Nginx Access Log"
-    path: "/var/log/nginx/loged_access.log"
+    path: "/var/log/nginx/catlog_access.log"
   - name: "Nginx SSL Access Log"
-    path: "/var/log/nginx/loged_ssl_access.log"
+    path: "/var/log/nginx/catlog_ssl_access.log"
   - name: "Nginx Error Log"
     path: "/var/log/nginx/error.log"
-  - name: "Loged Log"
-    path: "./runtime/loged.log"
+  - name: "Catlog Log"
+    path: "./runtime/catlog.log"
 ```
 
 ### RBAC
@@ -181,13 +181,13 @@ Automatic rate limiting is configured:
 ## File Structure
 
 ```
-loged/
+catlog/
 ├── README.md          # Documentation for this project
 ├── LICENSE            # License
 ├── config.yml         # Configuration file based on example.config.yml
 ├── example.config.yml # Example configuration
-├── loged              # Installation and Control Script
-├── loged-nginx        # Nginx configuration
+├── catlog              # Installation and Control Script
+├── catlog-nginx        # Nginx configuration
 ├── .gitattributes     # Defines how the contents stored in the repository are copied to the working tree
 ├── .gitignore         # Git ignore rules
 ├── src/               # Source code directory
@@ -196,9 +196,9 @@ loged/
 │   ├── go.sum         # Go dependency checksums
 │   └── sample.log     # Test log file
 └── runtime/           # Generated files (created automatically)
-    ├── loged-server   # Built binary
-    ├── loged.pid      # Process ID file (when running)
-    └── loged.log      # Server logs (when running)
+    ├── catlog-server   # Built binary
+    ├── catlog.pid      # Process ID file (when running)
+    └── catlog.log      # Server logs (when running)
 ```
 ## Total Hours Spent on this Idea
 ```

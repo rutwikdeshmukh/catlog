@@ -1,3 +1,3 @@
 # Ensure shell scripts are executable
-loged text eol=lf
+catlog text eol=lf
 *.sh text eol=lf

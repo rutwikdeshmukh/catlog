@@ -3,13 +3,13 @@ port: 8008
 timezone: "Asia/Kolkata"  # IST timezone for logs and timestamps
 ssl:
   enabled: true
-  cert_path: "/etc/ssl/certs/loged.crt"
-  key_path: "/etc/ssl/private/loged.key"
+  cert_path: "/etc/ssl/certs/catlog.crt"
+  key_path: "/etc/ssl/private/catlog.key"
 auth:
   enabled: true
   users:
     - username: "admin"
-      password: "loged123"
+      password: "catlog123"
       role: "admin"  # admin has access to all logs
     - username: "BEDeveloper"
       password: "backend123"
@@ -17,7 +17,7 @@ auth:
       allowed_paths:
         - "/var/log/supervisor/*"
         - "/var/log/app/*"
-        - "./runtime/loged.log"
+        - "./runtime/catlog.log"
     - username: "FEDeveloper"
       password: "frontend123"
       role: "frontend"
@@ -37,10 +37,10 @@ log_files:
   - name: "System Log"
     path: "/var/log/syslog"
   - name: "Nginx Access Log"
-    path: "/var/log/nginx/loged_access.log"
+    path: "/var/log/nginx/catlog_access.log"
   - name: "Nginx SSL Access Log"
-    path: "/var/log/nginx/loged_ssl_access.log"
+    path: "/var/log/nginx/catlog_ssl_access.log"
   - name: "Nginx Error Log"
     path: "/var/log/nginx/error.log"
-  - name: "Loged Log"
-    path: "./runtime/loged.log"
+  - name: "Catlog Log"
+    path: "./runtime/catlog.log"

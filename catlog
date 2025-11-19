@@ -3,13 +3,13 @@
 set -e
 
 RUNTIME_DIR="runtime"
-PIDFILE="$RUNTIME_DIR/loged.pid"
-LOGFILE="$RUNTIME_DIR/loged.log"
-BINARY="$RUNTIME_DIR/loged-server"
+PIDFILE="$RUNTIME_DIR/catlog.pid"
+LOGFILE="$RUNTIME_DIR/catlog.log"
+BINARY="$RUNTIME_DIR/catlog-server"
 
 # Function to install and build
 install_and_build() {
-    echo "🚀 Loged - Lightweight Log Viewer Setup"
+    echo "🚀 Catlog - Lightweight Log Viewer Setup"
     echo "======================================="
 
     # Create runtime directory
@@ -85,7 +85,7 @@ install_and_build() {
     cd src && go mod tidy && cd ..
 
     # Build the application
-    echo "🔨 Building loged..."
+    echo "🔨 Building catlog..."
     cd src && go build -o "../$BINARY" main.go && cd ..
 
     # Make it executable
@@ -105,15 +105,15 @@ install_and_build() {
         
         # Generate SSL certificate if it doesn't exist
         SSL_GENERATED=false
-        if [ ! -f "/etc/ssl/certs/loged.crt" ]; then
+        if [ ! -f "/etc/ssl/certs/catlog.crt" ]; then
             echo "🔒 Generating SSL certificate..."
             sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-                -keyout /etc/ssl/private/loged.key \
-                -out /etc/ssl/certs/loged.crt \
-                -subj "/C=US/ST=State/L=City/O=Loged/CN=$PUBLIC_IP" 2>/dev/null
+                -keyout /etc/ssl/private/catlog.key \
+                -out /etc/ssl/certs/catlog.crt \
+                -subj "/C=US/ST=State/L=City/O=Catlog/CN=$PUBLIC_IP" 2>/dev/null
             
-            sudo chmod 600 /etc/ssl/private/loged.key
-            sudo chmod 644 /etc/ssl/certs/loged.crt
+            sudo chmod 600 /etc/ssl/private/catlog.key
+            sudo chmod 644 /etc/ssl/certs/catlog.crt
             SSL_GENERATED=true
             echo "✅ SSL certificate generated"
         else
@@ -121,11 +121,11 @@ install_and_build() {
         fi
         
         # Create nginx config with dynamic IP
-        sed "s/SERVER_IP/$PUBLIC_IP/g" loged-nginx > /tmp/loged-nginx-configured
-        sudo cp /tmp/loged-nginx-configured /etc/nginx/sites-available/loged
-        rm /tmp/loged-nginx-configured
+        sed "s/SERVER_IP/$PUBLIC_IP/g" catlog-nginx > /tmp/catlog-nginx-configured
+        sudo cp /tmp/catlog-nginx-configured /etc/nginx/sites-available/catlog
+        rm /tmp/catlog-nginx-configured
         
-        sudo ln -sf /etc/nginx/sites-available/loged /etc/nginx/sites-enabled/loged
+        sudo ln -sf /etc/nginx/sites-available/catlog /etc/nginx/sites-enabled/catlog
         
         # Restart nginx only if SSL was newly generated, otherwise just reload
         if [ "$SSL_GENERATED" = true ]; then
@@ -134,11 +134,11 @@ install_and_build() {
             sudo nginx -s reload 2>/dev/null || sudo systemctl reload nginx 2>/dev/null || echo "⚠️  Please reload nginx manually"
         fi
         echo "✅ Nginx reverse proxy configured with SSL"
-        echo "📍 Access via: https://$PUBLIC_IP/loged"
+        echo "📍 Access via: https://$PUBLIC_IP/catlog"
         echo "⚠️  Browser will show security warning - click 'Advanced' → 'Proceed'"
     fi
 
-    echo "✅ Loged installed successfully!"
+    echo "✅ Catlog installed successfully!"
 }
 
 case "$1" in
@@ -151,7 +151,7 @@ case "$1" in
         if [ -f "$PIDFILE" ]; then
             PID=$(cat "$PIDFILE")
             if ps -p "$PID" > /dev/null 2>&1; then
-                echo "Loged is already running (PID: $PID)"
+                echo "Catlog is already running (PID: $PID)"
                 echo "Access at: http://localhost:8008"
                 exit 1
             else
@@ -159,25 +159,25 @@ case "$1" in
             fi
         fi
         
-        echo "🎉 Starting Loged server..."
+        echo "🎉 Starting Catlog server..."
         nohup "./$BINARY" > "$LOGFILE" 2>&1 &
         PID=$!
         echo $PID > "$PIDFILE"
         
         sleep 1
         if ps -p "$PID" > /dev/null 2>&1; then
-            echo "✅ Loged started successfully (PID: $PID)"
+            echo "✅ Catlog started successfully (PID: $PID)"
             echo "📍 Server available at: http://localhost:8008"
             echo "📄 Configuration loaded from config.yml"
         else
-            echo "❌ Failed to start Loged"
+            echo "❌ Failed to start Catlog"
             rm -f "$PIDFILE"
             exit 1
         fi
         ;;
     
     stop)
-        echo "🛑 Stopping Loged..."
+        echo "🛑 Stopping Catlog..."
         
         # Kill by PID file first
         if [ -f "$PIDFILE" ]; then
@@ -193,36 +193,36 @@ case "$1" in
             rm -f "$PIDFILE"
         fi
         
-        # Kill any remaining loged-server processes by name
-        pkill -f "loged-server" 2>/dev/null || true
+        # Kill any remaining catlog-server processes by name
+        pkill -f "catlog-server" 2>/dev/null || true
         sleep 1
         
         # Force kill any stubborn processes
-        pkill -9 -f "loged-server" 2>/dev/null || true
+        pkill -9 -f "catlog-server" 2>/dev/null || true
         
         # Kill any process using port 8008
         lsof -ti:8008 2>/dev/null | xargs kill -9 2>/dev/null || true
         
-        echo "✅ Loged stopped"
+        echo "✅ Catlog stopped"
         ;;
     
     status)
         if [ -f "$PIDFILE" ]; then
             PID=$(cat "$PIDFILE")
             if ps -p "$PID" > /dev/null 2>&1; then
-                echo "✅ Loged is running (PID: $PID)"
+                echo "✅ Catlog is running (PID: $PID)"
                 echo "📍 Access at: http://localhost:8008"
             else
-                echo "❌ Loged is not running"
+                echo "❌ Catlog is not running"
                 rm -f "$PIDFILE"
             fi
         else
-            echo "❌ Loged is not running"
+            echo "❌ Catlog is not running"
         fi
         ;;
     
     update)
-        echo "🔄 Updating Loged..."
+        echo "🔄 Updating Catlog..."
         
         # Force stop any running instances
         echo "🛑 Stopping any running instances..."
@@ -246,12 +246,12 @@ case "$1" in
             PUBLIC_IP=$(curl -s ifconfig.me || curl -s ipinfo.io/ip || curl -s icanhazip.com || echo "127.0.0.1")
             
             # Create nginx config with dynamic IP
-            sed "s/SERVER_IP/$PUBLIC_IP/g" loged-nginx > /tmp/loged-nginx-configured
-            sudo cp /tmp/loged-nginx-configured /etc/nginx/sites-available/loged
-            rm /tmp/loged-nginx-configured
+            sed "s/SERVER_IP/$PUBLIC_IP/g" catlog-nginx > /tmp/catlog-nginx-configured
+            sudo cp /tmp/catlog-nginx-configured /etc/nginx/sites-available/catlog
+            rm /tmp/catlog-nginx-configured
             
-            if [ ! -L /etc/nginx/sites-enabled/loged ]; then
-                sudo ln -s /etc/nginx/sites-available/loged /etc/nginx/sites-enabled/loged
+            if [ ! -L /etc/nginx/sites-enabled/catlog ]; then
+                sudo ln -s /etc/nginx/sites-available/catlog /etc/nginx/sites-enabled/catlog
             fi
             sudo nginx -s reload 2>/dev/null || sudo systemctl reload nginx 2>/dev/null || echo "⚠️  Please reload nginx manually"
             echo "✅ Nginx configuration updated"
@@ -263,7 +263,7 @@ case "$1" in
         ;;
     
     uninstall)
-        echo "🗑️ Uninstalling Loged..."
+        echo "🗑️ Uninstalling Catlog..."
         
         # Stop server if running
         $0 stop 2>/dev/null || true
@@ -271,27 +271,27 @@ case "$1" in
         # Remove nginx configuration
         if [[ "$OSTYPE" == "linux-gnu"* ]] && command -v nginx &> /dev/null; then
             echo "🌐 Removing nginx configuration..."
-            sudo rm -f /etc/nginx/sites-enabled/loged
-            sudo rm -f /etc/nginx/sites-available/loged
+            sudo rm -f /etc/nginx/sites-enabled/catlog
+            sudo rm -f /etc/nginx/sites-available/catlog
             sudo nginx -s reload 2>/dev/null || sudo systemctl reload nginx 2>/dev/null || true
         fi
         
         # Remove SSL certificates
         echo "🔒 Removing SSL certificates..."
-        sudo rm -f /etc/ssl/certs/loged.crt
-        sudo rm -f /etc/ssl/private/loged.key
+        sudo rm -f /etc/ssl/certs/catlog.crt
+        sudo rm -f /etc/ssl/private/catlog.key
         
         # Remove runtime directory
         echo "📁 Removing runtime files..."
         rm -rf runtime/
         
         # Remove built binary
-        rm -f loged-server
+        rm -f catlog-server
         
         # Remove log and pid files
-        rm -f loged.log loged.pid
+        rm -f catlog.log catlog.pid
         
-        echo "✅ Loged uninstalled successfully"
+        echo "✅ Catlog uninstalled successfully"
         echo "📝 Note: Go and nginx packages were not removed"
         echo "📝 Note: config.yml was preserved"
         ;;
@@ -300,20 +300,20 @@ case "$1" in
         install_and_build
         echo ""
         echo "🎉 Installation complete!"
-        echo "📍 Run 'loged start' to start the server"
-        echo "📍 Run 'loged stop' to stop the server"
+        echo "📍 Run 'catlog start' to start the server"
+        echo "📍 Run 'catlog stop' to stop the server"
         ;;
     
     *)
-        echo "Usage: loged {start|stop|status|install|update|uninstall}"
+        echo "Usage: catlog {start|stop|status|install|update|uninstall}"
         echo ""
         echo "Commands:"
-        echo "  start     - Start Loged server in background"
-        echo "  stop      - Stop Loged server"
-        echo "  status    - Check if Loged is running"
+        echo "  start     - Start Catlog server in background"
+        echo "  stop      - Stop Catlog server"
+        echo "  status    - Check if Catlog is running"
         echo "  install   - Install dependencies and build"
         echo "  update    - Stop, rebuild, and restart server"
-        echo "  uninstall - Remove all loged files and configurations"
+        echo "  uninstall - Remove all catlog files and configurations"
         exit 1
         ;;
 esac

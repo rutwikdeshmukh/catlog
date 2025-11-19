@@ -1,4 +1,4 @@
-module loged
+module catlog
 
 go 1.21
 
