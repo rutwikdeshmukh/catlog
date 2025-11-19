@@ -1,0 +1,11 @@
+# Configuration file for the log monitoring application
+port: 8008
+log_files:
+  - name: "Sample Log"
+    path: "./sample.log"
+  - name: "System Log"
+    path: "/var/log/syslog"
+  - name: "Auth Log"
+    path: "/var/log/auth.log"
+  - name: "Application Log"
+    path: "./app.log"

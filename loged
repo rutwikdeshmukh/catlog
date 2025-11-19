@@ -1,0 +1,147 @@
+#!/bin/bash
+
+set -e
+
+PIDFILE="loged.pid"
+LOGFILE="loged.log"
+
+# Function to install and build
+install_and_build() {
+    echo "🚀 Loged - Lightweight Log Viewer Setup"
+    echo "======================================="
+
+    # Check if Go is installed
+    if ! command -v go &> /dev/null; then
+        echo "📦 Installing Go..."
+        
+        # Detect OS and install Go
+        if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            # Linux
+            if command -v apt-get &> /dev/null; then
+                sudo apt-get update -qq
+                sudo apt-get install -y golang-go
+            elif command -v yum &> /dev/null; then
+                sudo yum install -y golang
+            elif command -v dnf &> /dev/null; then
+                sudo dnf install -y golang
+            else
+                echo "❌ Unsupported Linux distribution. Please install Go manually."
+                exit 1
+            fi
+        elif [[ "$OSTYPE" == "darwin"* ]]; then
+            # macOS
+            if command -v brew &> /dev/null; then
+                brew install go
+            else
+                echo "❌ Please install Homebrew first or install Go manually from https://golang.org/dl/"
+                exit 1
+            fi
+        else
+            echo "❌ Unsupported OS. Please install Go manually from https://golang.org/dl/"
+            exit 1
+        fi
+    else
+        echo "✅ Go is already installed: $(go version)"
+    fi
+
+    # Install dependencies
+    echo "📦 Installing dependencies..."
+    go mod tidy
+
+    # Build the application
+    echo "🔨 Building loged..."
+    go build -o loged-server main.go
+
+    # Make it executable
+    chmod +x loged-server
+
+    echo "✅ Loged installed successfully!"
+}
+
+case "$1" in
+    start)
+        # Build if binary doesn't exist
+        if [ ! -f "loged-server" ]; then
+            install_and_build
+        fi
+        
+        if [ -f "$PIDFILE" ]; then
+            PID=$(cat "$PIDFILE")
+            if ps -p "$PID" > /dev/null 2>&1; then
+                echo "Loged is already running (PID: $PID)"
+                echo "Access at: http://localhost:8008"
+                exit 1
+            else
+                rm -f "$PIDFILE"
+            fi
+        fi
+        
+        echo "🎉 Starting Loged server..."
+        nohup ./loged-server > "$LOGFILE" 2>&1 &
+        PID=$!
+        echo $PID > "$PIDFILE"
+        
+        sleep 1
+        if ps -p "$PID" > /dev/null 2>&1; then
+            echo "✅ Loged started successfully (PID: $PID)"
+            echo "📍 Server available at: http://localhost:8008"
+            echo "📄 Configuration loaded from config.yml"
+        else
+            echo "❌ Failed to start Loged"
+            rm -f "$PIDFILE"
+            exit 1
+        fi
+        ;;
+    
+    stop)
+        if [ ! -f "$PIDFILE" ]; then
+            echo "Loged is not running"
+            exit 1
+        fi
+        
+        PID=$(cat "$PIDFILE")
+        if ps -p "$PID" > /dev/null 2>&1; then
+            echo "🛑 Stopping Loged (PID: $PID)..."
+            kill "$PID"
+            rm -f "$PIDFILE"
+            echo "✅ Loged stopped"
+        else
+            echo "Loged is not running"
+            rm -f "$PIDFILE"
+        fi
+        ;;
+    
+    status)
+        if [ -f "$PIDFILE" ]; then
+            PID=$(cat "$PIDFILE")
+            if ps -p "$PID" > /dev/null 2>&1; then
+                echo "✅ Loged is running (PID: $PID)"
+                echo "📍 Access at: http://localhost:8008"
+            else
+                echo "❌ Loged is not running"
+                rm -f "$PIDFILE"
+            fi
+        else
+            echo "❌ Loged is not running"
+        fi
+        ;;
+    
+    ""|install)
+        install_and_build
+        echo ""
+        echo "🎉 Installation complete!"
+        echo "📍 Run 'loged start' to start the server"
+        echo "📍 Run 'loged stop' to stop the server"
+        ;;
+    
+    *)
+        echo "Usage: loged {start|stop|status|install}"
+        echo ""
+        echo "Commands:"
+        echo "  start   - Start Loged server in background"
+        echo "  stop    - Stop Loged server"
+        echo "  status  - Check if Loged is running"
+        echo "  install - Install dependencies and build"
+        exit 1
+        ;;
+esac
