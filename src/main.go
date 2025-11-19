@@ -336,7 +336,7 @@ input[type="text"]:focus, input[type="password"]:focus {
 <body>
 <div class="login-container">
     <div style="text-align: center; margin-bottom: 20px;">
-        <img src="/catlog.png" alt="Catlog" style="height: 48px; width: auto;">
+        <img src="/catlog.png" alt="Catlog" style="height: 80px; width: auto;">
     </div>
     <h1>catlog</h1>
     <form method="POST">
@@ -474,7 +474,7 @@ input[type="text"]:focus, input[type="password"]:focus {
 <body>
 <div class="login-container">
     <div style="text-align: center; margin-bottom: 20px;">
-        <img src="/catlog.png" alt="Catlog" style="height: 48px; width: auto;">
+        <img src="/catlog.png" alt="Catlog" style="height: 80px; width: auto;">
     </div>
     <h1>catlog</h1>
     <div class="error">Invalid username or password</div>
@@ -699,7 +699,7 @@ h1 {
 <body>
 <div class="container">
     <div style="text-align: center; margin-bottom: 20px;">
-        <img src="/catlog.png" alt="Catlog" style="height: 64px; width: auto;">
+        <img src="/catlog.png" alt="Catlog" style="height: 80px; width: auto;">
     </div>
     <h1>catlog</h1>
     <p class="subtitle">Real-time log streaming for your server - monitor log files instantly through your browser</p>
@@ -873,7 +873,7 @@ h1 {
 <div class="container">
 <div class="header-main">
 <div style="display: flex; align-items: center; gap: 15px;">
-<img src="/catlog.png" alt="Catlog" style="height: 32px; width: auto;">
+<img src="/catlog.png" alt="Catlog" style="height: 40px; width: auto;">
 <h1>Catlog - Real-time Log Viewer</h1>
 </div>
 <button class="logout-btn" onclick="logout()">Logout</button>
@@ -1088,7 +1088,7 @@ h1 {
 <div class="header">
     <div style="display: flex; align-items: center; gap: 15px;">
         <a href="%s" class="back-link">Back to Log List</a>
-        <img src="/catlog.png" alt="Catlog" style="height: 24px; width: auto;">
+        <img src="/catlog.png" alt="Catlog" style="height: 32px; width: auto;">
         <h1>%s</h1>
     </div>
     <div class="header-right">
