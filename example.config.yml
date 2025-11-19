@@ -5,8 +5,8 @@
 port: 8008
 auth:
   enabled: true
-  username: "admin"
-  password: "loged123"
+  username: "admin" # TO BE CHANGED BEFORE INITIAL SETUP
+  password: "loged123" # TO BE CHANGED BEFORE INITIAL SETUP
 log_files:
   - name: "Sample Log"
     path: "./src/sample.log"
