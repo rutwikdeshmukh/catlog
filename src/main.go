@@ -259,7 +259,7 @@ func handleIndex(w http.ResponseWriter, r *http.Request) {
 body { 
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
     margin: 0; padding: 0; 
-    background: #282a36;
+    background: #1e1f29;
     color: #f8f8f2; 
     min-height: 100vh;
 }
@@ -276,11 +276,11 @@ h1 {
     font-weight: 600;
 }
 .section { 
-    background: #44475a;
+    background: #383a59;
     margin: 25px 0; 
     padding: 25px; 
     border-radius: 8px; 
-    border: 1px solid #6272a4;
+    border: 1px solid #4f5374;
 }
 .section h3 { 
     color: #50fa7b; 
@@ -292,7 +292,7 @@ h1 {
 .log-item { 
     margin: 15px 0; 
     padding: 15px; 
-    background: #282a36;
+    background: #1e1f29;
     border-radius: 6px; 
     border-left: 4px solid #8be9fd;
     transition: border-color 0.2s ease;
@@ -326,8 +326,8 @@ h1 {
     padding: 12px 15px; 
     flex: 1; 
     min-width: 300px; 
-    background: #282a36; 
-    border: 1px solid #6272a4; 
+    background: #1e1f29; 
+    border: 1px solid #4f5374; 
     border-radius: 6px; 
     color: #f8f8f2; 
     font-size: 14px;
@@ -410,14 +410,14 @@ h1 {
 body { 
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
     margin: 0; padding: 0; 
-    background: #282a36;
+    background: #1e1f29;
     color: #f8f8f2; 
     height: 100vh;
 }
 .header { 
-    background: #44475a;
+    background: #383a59;
     padding: 20px 25px; 
-    border-bottom: 1px solid #6272a4;
+    border-bottom: 1px solid #4f5374;
 }
 .back-link { 
     color: #8be9fd; 
@@ -441,10 +441,10 @@ h1 {
     margin: 10px 0 0 0; 
     font-size: 14px;
     padding: 8px 12px;
-    background: #282a36;
+    background: #1e1f29;
     border-radius: 4px;
     display: inline-block;
-    border: 1px solid #44475a;
+    border: 1px solid #383a59;
 }
 .container { 
     padding: 20px; 
@@ -458,9 +458,9 @@ h1 {
     align-items: center;
     gap: 15px;
     padding: 15px;
-    background: #44475a;
+    background: #383a59;
     border-radius: 6px;
-    border: 1px solid #6272a4;
+    border: 1px solid #4f5374;
 }
 #loadMoreBtn {
     background: #ff79c6;
@@ -486,11 +486,11 @@ h1 {
     font-size: 14px;
 }
 #logs { 
-    background: #282a36;
+    background: #1e1f29;
     padding: 15px; 
     flex: 1; 
     overflow-y: auto; 
-    border: 1px solid #44475a; 
+    border: 1px solid #383a59; 
     border-radius: 6px;
     font-size: 13px;
     line-height: 1.5;
@@ -503,7 +503,7 @@ h1 {
     transition: background 0.2s;
 }
 .log-line:hover {
-    background: #44475a;
+    background: #383a59;
 }
 .log-line.new {
     background: rgba(80,250,123,0.2);
@@ -514,13 +514,13 @@ h1 {
     100%% { background: transparent; }
 }
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #44475a; }
+::-webkit-scrollbar-track { background: #383a59; }
 ::-webkit-scrollbar-thumb { 
-    background: #6272a4; 
+    background: #4f5374; 
     border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover { 
-    background: #bd93f9;
+    background: #6272a4;
 }
 </style>
 </head>
