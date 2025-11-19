@@ -471,12 +471,31 @@ body {
     margin: 0 auto; 
     padding: 40px 20px; 
 }
+.header-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
 h1 { 
     color: #bd93f9; 
-    text-align: center; 
-    margin-bottom: 40px; 
+    margin: 0; 
     font-size: 32px; 
     font-weight: 600;
+}
+.logout-btn {
+    background: #ff5555;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.logout-btn:hover {
+    background: #ff7979;
+    transform: translateY(-1px);
 }
 .section { 
     background: #383a59;
@@ -563,7 +582,10 @@ h1 {
 </head>
 <body>
 <div class="container">
+<div class="header-main">
 <h1>Loged - Real-time Log Viewer</h1>
+<button class="logout-btn" onclick="logout()">Logout</button>
+</div>
 <div class="section">
 <h3>Available Log Files</h3>`)
 
@@ -592,6 +614,20 @@ h1 {
 </form>
 </div>
 </div>
+<script>
+function logout() {
+    // Clear authentication by making a request with invalid credentials
+    fetch(window.location.href, {
+        method: 'GET',
+        headers: {
+            'Authorization': 'Basic ' + btoa('invalid:invalid')
+        }
+    }).then(() => {
+        // Redirect to trigger new authentication
+        window.location.href = window.location.origin + window.location.pathname.replace('/app', '');
+    });
+}
+</script>
 </body>
 </html>`, basePath)
 		return
@@ -633,12 +669,19 @@ body {
     background: #383a59;
     padding: 20px 25px; 
     border-bottom: 1px solid #4f5374;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 .back-link { 
     color: #1e1f29;
     background: #8be9fd;
     text-decoration: none; 
-    margin-right: 20px; 
     padding: 8px 16px;
     border-radius: 6px;
     font-weight: 500;
@@ -646,6 +689,20 @@ body {
 }
 .back-link:hover { 
     background: #50fa7b;
+    transform: translateY(-1px);
+}
+.logout-btn {
+    background: #ff5555;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.logout-btn:hover {
+    background: #ff7979;
     transform: translateY(-1px);
 }
 h1 { 
@@ -747,7 +804,10 @@ h1 {
 <div class="header">
     <a href="%s" class="back-link">Back to Log List</a>
     <h1>%s</h1>
-    <div id="status">Connecting...</div>
+    <div class="header-right">
+        <div id="status">Connecting...</div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
 </div>
 <div class="container">
     <div class="log-controls">
@@ -881,6 +941,19 @@ function loadMore() {
 function updateLogInfo() {
     logInfo.textContent = 'Showing ' + shownLines + ' of ' + totalLines + ' lines';
     loadMoreBtn.style.display = shownLines >= totalLines ? 'none' : 'inline-block';
+}
+
+function logout() {
+    // Clear authentication by making a request with invalid credentials
+    fetch(window.location.href, {
+        method: 'GET',
+        headers: {
+            'Authorization': 'Basic ' + btoa('invalid:invalid')
+        }
+    }).then(() => {
+        // Redirect to trigger new authentication
+        window.location.href = window.location.origin + window.location.pathname.replace('/app', '');
+    });
 }
 </script>
 </body>
