@@ -647,7 +647,8 @@ h1 {
 console.log('Connecting to WebSocket...');
 const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
 const basePath = '%s';
-const wsPath = basePath ? basePath + '/ws' : '/ws';
+// WebSocket endpoint is always /ws, not /app/ws
+const wsPath = basePath && basePath.includes('/loged') ? '/loged/ws' : '/ws';
 const ws = new WebSocket(wsProtocol + '//' + location.host + wsPath + '?file=%s');
 const logs = document.getElementById('logs');
 const status = document.getElementById('status');
@@ -732,7 +733,7 @@ function loadMore() {
     loadMoreBtn.textContent = 'Loading...';
     
     // Request more lines from server
-    const apiPath = basePath ? basePath + '/api/loadmore' : '/api/loadmore';
+    const apiPath = basePath && basePath.includes('/loged') ? '/loged/api/loadmore' : '/api/loadmore';
     fetch(apiPath + '?file=%s&offset=' + (totalLines - shownLines - 100) + '&limit=100')
         .then(response => response.json())
         .then(data => {
