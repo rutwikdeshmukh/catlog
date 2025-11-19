@@ -1,0 +1,18 @@
+# Example Configuration file for the log monitoring application
+
+# COPY ITS CONTENTS TO 'config.yml' ONCE UPDATED TO TAKE EFFECT
+
+port: 8008
+auth:
+  enabled: true
+  username: "admin"
+  password: "loged123"
+log_files:
+  - name: "Sample Log"
+    path: "./src/sample.log"
+  - name: "EXAMPLE1"
+    path: "EXAMPLE/1/LOG/PATH"
+  - name: "EXAMPLE2"
+    path: "EXAMPLE/2/LOG/PATH"
+  - name: "EXAMPLE3"
+    path: "EXAMPLE/3/LOG/PATH"
