@@ -64,7 +64,7 @@ func generateSessionID() string {
 func createSession(user *User) string {
 	sessionMutex.Lock()
 	defer sessionMutex.Unlock()
-	
+
 	sessionID := generateSessionID()
 	sessions[sessionID] = &Session{
 		ID:        sessionID,
@@ -498,10 +498,10 @@ input[type="text"]:focus, input[type="password"]:focus {
 		}
 
 		log.Printf("LOGIN SUCCESS: IP=%s, Username=%s, Role=%s", clientIP, username, authenticatedUser.Role)
-		
+
 		// Create session
 		sessionID := createSession(authenticatedUser)
-		
+
 		// Set session cookie
 		http.SetCookie(w, &http.Cookie{
 			Name:     "session_id",
@@ -632,7 +632,7 @@ func handleLanding(w http.ResponseWriter, r *http.Request) {
 <!DOCTYPE html>
 <html>
 <head>
-<title>Catlog - Real-time Log Viewer</title>
+<title>Catlog - Log Viewer</title>
 <link rel="icon" type="image/png" href="/catlog.png">
 <style>
 * { box-sizing: border-box; }
@@ -701,7 +701,7 @@ body {
         <img src="/catlog.png" alt="catlog" style="height: 200px; width: auto;">
     </div>
     <p class="subtitle">Real-time log streaming for your server - monitor log files instantly through your browser</p>
-    
+
     <div class="ssl-warning">
         <h3>SSL Certificate Notice</h3>
         <p>This server uses a self-signed SSL certificate for secure connections.</p>
@@ -873,7 +873,7 @@ h1 {
 <div class="header-main">
 <div style="display: flex; align-items: center; gap: 15px;">
 <img src="/catlog.png" alt="catlog" style="height: 60px; width: auto;">
-<h1>catlog - Real-time Log Viewer</h1>
+<h1>catlog - Log Viewer</h1>
 </div>
 <button class="logout-btn" onclick="logout()">Logout</button>
 </div>
@@ -1128,7 +1128,7 @@ ws.onopen = function() {
 
 ws.onmessage = function(event) {
     const data = event.data;
-    
+
     // Handle metadata messages
     if (data.startsWith('__META__:')) {
         const parts = data.split(':');
@@ -1143,16 +1143,16 @@ ws.onmessage = function(event) {
             return;
         }
     }
-    
+
     // Regular log line
     const line = document.createElement('div');
     line.className = 'log-line new';
-    
+
     // Highlight error keywords
     let content = data;
     content = content.replace(/\b(error|Error|ERROR)\b/g, '<span style="color: #f48771; font-weight: bold;">$1</span>');
     line.innerHTML = content;
-    
+
     // If it's a new real-time log (not from load more)
     if (!data.startsWith('__HISTORICAL__:')) {
         logs.appendChild(line);
@@ -1170,7 +1170,7 @@ ws.onmessage = function(event) {
         shownLines++;
         updateLogInfo();
     }
-    
+
     // Remove animation class after animation completes
     setTimeout(() => line.classList.remove('new'), 500);
 };
@@ -1189,10 +1189,10 @@ ws.onerror = function(error) {
 
 function loadMore() {
     if (shownLines >= totalLines) return;
-    
+
     loadMoreBtn.disabled = true;
     loadMoreBtn.textContent = 'Loading...';
-    
+
     // Request more lines from server
     const apiPath = basePath && basePath.includes('/catlog') ? '/catlog/api/loadmore' : '/api/loadmore';
     fetch(apiPath + '?file=%s&offset=' + (totalLines - shownLines - 100) + '&limit=100')
@@ -1200,7 +1200,7 @@ function loadMore() {
         .then(data => {
             const scrollPos = logs.scrollTop;
             const scrollHeight = logs.scrollHeight;
-            
+
             data.lines.forEach(lineText => {
                 const line = document.createElement('div');
                 line.className = 'log-line';
@@ -1209,12 +1209,12 @@ function loadMore() {
                 line.innerHTML = highlightedText;
                 logs.insertBefore(line, logs.firstChild);
             });
-            
+
             shownLines += data.lines.length;
-            
+
             // Maintain scroll position
             logs.scrollTop = scrollPos + (logs.scrollHeight - scrollHeight);
-            
+
             updateLogInfo();
             loadMoreBtn.disabled = false;
             loadMoreBtn.textContent = 'Load 100 More Lines';
