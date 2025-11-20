@@ -277,12 +277,9 @@ body {
     max-width: 400px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
-h1 {
-    color: #e0e0e0;
+.logo {
     text-align: center;
     margin-bottom: 30px;
-    font-size: 28px;
-    font-weight: 500;
 }
 .form-group {
     margin-bottom: 20px;
@@ -340,10 +337,9 @@ input[type="text"]:focus, input[type="password"]:focus {
 </head>
 <body>
 <div class="login-container">
-    <div style="text-align: center; margin-bottom: 20px;">
-        <img src="/catlog.png" alt="catlog" style="height: 80px; width: auto;">
+    <div class="logo">
+        <img src="/catlog.png" alt="catlog" style="height: 120px; width: auto;">
     </div>
-    <h1>catlog</h1>
     <form method="POST">
         <div class="form-group">
             <label for="username">Username</label>
@@ -420,12 +416,9 @@ body {
     max-width: 400px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
-h1 {
-    color: #e0e0e0;
+.logo {
     text-align: center;
     margin-bottom: 30px;
-    font-size: 28px;
-    font-weight: 500;
 }
 .form-group {
     margin-bottom: 20px;
@@ -483,10 +476,9 @@ input[type="text"]:focus, input[type="password"]:focus {
 </head>
 <body>
 <div class="login-container">
-    <div style="text-align: center; margin-bottom: 20px;">
-        <img src="/catlog.png" alt="catlog" style="height: 80px; width: auto;">
+    <div class="logo">
+        <img src="/catlog.png" alt="catlog" style="height: 120px; width: auto;">
     </div>
-    <h1>catlog</h1>
     <div class="error">Invalid username or password</div>
     <form method="POST">
         <div class="form-group">
@@ -642,7 +634,6 @@ func handleLanding(w http.ResponseWriter, r *http.Request) {
 <head>
 <title>Catlog - Real-time Log Viewer</title>
 <link rel="icon" type="image/png" href="/catlog.png">
-<link rel="icon" type="image/png" href="/catlog.png">
 <style>
 * { box-sizing: border-box; }
 body { 
@@ -660,11 +651,8 @@ body {
     padding: 40px; 
     text-align: center;
 }
-h1 { 
-    color: #e0e0e0; 
-    font-size: 48px; 
-    font-weight: 500;
-    margin-bottom: 20px;
+.logo {
+    margin-bottom: 40px;
 }
 .subtitle {
     color: #a0a0a0;
@@ -709,10 +697,9 @@ h1 {
 </head>
 <body>
 <div class="container">
-    <div style="text-align: center; margin-bottom: 20px;">
-        <img src="/catlog.png" alt="catlog" style="height: 80px; width: auto;">
+    <div class="logo">
+        <img src="/catlog.png" alt="catlog" style="height: 200px; width: auto;">
     </div>
-    <h1>catlog</h1>
     <p class="subtitle">Real-time log streaming for your server - monitor log files instantly through your browser</p>
     
     <div class="ssl-warning">
@@ -727,7 +714,6 @@ h1 {
 
 <script>
 function proceedToApp() {
-    // Redirect to HTTPS for secure log viewer
     const protocol = 'https:';
     const host = window.location.host;
     const basePath = '%s';
@@ -886,7 +872,7 @@ h1 {
 <div class="container">
 <div class="header-main">
 <div style="display: flex; align-items: center; gap: 15px;">
-<img src="/catlog.png" alt="catlog" style="height: 40px; width: auto;">
+<img src="/catlog.png" alt="catlog" style="height: 60px; width: auto;">
 <h1>catlog - Real-time Log Viewer</h1>
 </div>
 <button class="logout-btn" onclick="logout()">Logout</button>
@@ -1103,7 +1089,7 @@ h1 {
 <div class="header">
     <div style="display: flex; align-items: center; gap: 15px;">
         <a href="%s" class="back-link">Back to Log List</a>
-        <img src="/catlog.png" alt="catlog" style="height: 32px; width: auto;">
+        <img src="/catlog.png" alt="catlog" style="height: 50px; width: auto;">
         <h1>%s</h1>
     </div>
     <div class="header-right">
@@ -1136,7 +1122,7 @@ let allLines = [];
 
 ws.onopen = function() {
     console.log('WebSocket connected');
-    status.textContent = 'Connected - Monitoring log file';
+    status.textContent = 'CONNECTED';
     status.style.color = '#4ec9b0';
 };
 
@@ -1191,13 +1177,13 @@ ws.onmessage = function(event) {
 
 ws.onclose = function() {
     console.log('WebSocket closed');
-    status.textContent = 'Connection closed';
+    status.textContent = 'DISCONNECTED';
     status.style.color = '#f48771';
 };
 
 ws.onerror = function(error) {
     console.error('WebSocket error:', error);
-    status.textContent = 'Connection error';
+    status.textContent = 'DISCONNECTED';
     status.style.color = '#f48771';
 };
 
