@@ -13,84 +13,57 @@ A lightweight, cross-platform log viewer application that streams log files in r
 - 🎯 Path-based access control for different users
 - ⚡ Lightweight and fast
 
-## Quick Start
+---
+
+## Local Setup (Windows/macOS/Linux)
 
 ### Prerequisites
-- Go 1.16+ installed
 
-### Local Development (Windows/macOS/Linux)
+- **Go 1.16+** - Download from https://golang.org/dl/
+- **Git** (optional, for cloning the repository)
 
-1. **Clone and setup:**
+### Installation Steps
+
+1. **Clone the repository:**
 ```bash
+git clone <repository-url>
 cd loged
+```
+
+2. **Copy configuration file:**
+```bash
 cp example.config.yml config.yml
 ```
 
-2. **Install and build:**
+3. **Edit config.yml (optional):**
+```bash
+# Update default credentials and log file paths as needed
+nano config.yml
+```
+
+4. **Install dependencies and build:**
 ```bash
 ./catlog install
 ```
 
-3. **Start the server:**
+This will:
+- Check if Go is installed
+- Install Go dependencies
+- Build the application binary
+
+5. **Start the server:**
 ```bash
 ./catlog start
 ```
 
-4. **Access the application:**
+6. **Access the application:**
 Open your browser and go to: `http://localhost:8008`
 
-Default credentials:
+**Default Credentials:**
 - Username: `admin`
 - Password: `catlog123`
 
-## Configuration
-
-### config.yml
-
-```yaml
-port: 8008                    # Port to run on
-base_url: ""                  # Leave empty for localhost, or set to "/catlog" for nginx
-ssl:
-  enabled: false              # Set to true when using nginx with SSL
-  cert_path: "/etc/ssl/certs/catlog.crt"
-  key_path: "/etc/ssl/private/catlog.key"
-auth:
-  enabled: true
-  users:
-    - username: "admin"
-      password: "catlog123"
-      role: "admin"           # admin has access to all logs
-      allowed_paths: []
-    - username: "user"
-      password: "password"
-      role: "user"
-      allowed_paths:
-        - "/var/log/app/*"    # Supports wildcards
-        - "/var/log/nginx/*"
-log_files:
-  - name: "Application Log"
-    path: "./runtime/catlog.log"
-  - name: "System Log"
-    path: "/var/log/syslog"
-```
-
-### Base URL Configuration
-
-**For Local Development:**
-```yaml
-base_url: ""
-```
-Access at: `http://localhost:8008`
-
-**For Nginx Reverse Proxy:**
-```yaml
-base_url: "/catlog"
-```
-Access at: `https://your-server/catlog`
-
-## Usage
-
-### Catlog Commands
+### Local Commands
 
 ```bash
 ./catlog install              # Install dependencies and build
@@ -102,18 +75,146 @@ Access at: `https://your-server/catlog`
 ./catlog uninstall            # Remove all files
 ```
 
-### Nginx Commands (Linux only)
+### Local Configuration
 
-```bash
-./catlog nginx setup          # Install nginx, generate SSL, and configure reverse proxy
-./catlog nginx restart        # Restart nginx
-./catlog nginx stop           # Stop nginx
-./catlog nginx remove         # Remove catlog nginx configuration
+Edit `config.yml`:
+```yaml
+port: 8008
+base_url: ""                  # Leave empty for localhost
+ssl:
+  enabled: false
+auth:
+  enabled: true
+  users:
+    - username: "admin"
+      password: "catlog123"
+      role: "admin"
+log_files:
+  - name: "Application Log"
+    path: "./runtime/catlog.log"
 ```
 
-## Server Setup with Nginx
+---
 
-### 1. Setup Nginx
+## Linux Server Setup
+
+### Prerequisites
+
+- **Linux OS** (Ubuntu, Debian, CentOS, Fedora, etc.)
+- **Go 1.16+** - Will be installed automatically
+- **Nginx** (optional, for reverse proxy) - Will be installed automatically
+- **sudo access** - Required for nginx and SSL setup
+
+### Installation Steps
+
+1. **Clone the repository:**
+```bash
+git clone <repository-url>
+cd loged
+```
+
+2. **Copy configuration file:**
+```bash
+cp example.config.yml config.yml
+```
+
+3. **Edit config.yml (optional):**
+```bash
+# Update default credentials and log file paths as needed
+nano config.yml
+```
+
+4. **Grant permissions, install dependencies and build:**
+```bash
+chmod +x ./catlog
+./catlog install
+```
+
+This will:
+- Install Go (if not already installed)
+- Install Go dependencies
+- Build the application binary
+- Setup auto-start on boot (via crontab)
+
+5. **Start the server:**
+```bash
+./catlog start
+```
+
+6. **Access the application:**
+Open your browser and go to: `http://<server-ip>:8008`
+
+### Linux Commands
+
+```bash
+./catlog install              # Install dependencies and build
+./catlog start                # Start the server
+./catlog stop                 # Stop the server
+./catlog status               # Check if running
+./catlog restart              # Restart the server
+./catlog update               # Update and rebuild
+./catlog uninstall            # Remove all files
+```
+
+### Linux Configuration (Standalone)
+
+Edit `config.yml`:
+```yaml
+port: 8008
+base_url: ""                  # Leave empty for standalone
+ssl:
+  enabled: false
+auth:
+  enabled: true
+  users:
+    - username: "admin"
+      password: "catlog123"
+      role: "admin"
+log_files:
+  - name: "System Log"
+    path: "/var/log/syslog"
+  - name: "Nginx Access"
+    path: "/var/log/nginx/access.log"
+```
+
+---
+
+## Linux Server Setup with Nginx
+
+### Prerequisites
+
+- **Linux OS** (Ubuntu, Debian, CentOS, Fedora, etc.)
+- **Go 1.16+** - Will be installed automatically
+- **Nginx** - Will be installed automatically
+- **OpenSSL** - Usually pre-installed
+- **sudo access** - Required for nginx and SSL setup
+
+### Installation Steps
+
+1. **Clone the repository:**
+```bash
+git clone <repository-url>
+cd loged
+```
+
+2. **Copy configuration file:**
+```bash
+cp example.config.yml config.yml
+```
+
+3. **Edit config.yml (optional):**
+```bash
+# Update default credentials and log file paths as needed
+nano config.yml
+```
+
+4. **Grant permissions, install dependencies and build:**
+```bash
+chmod +x ./catlog
+./catlog install
+```
+
+5. **Setup Nginx with SSL:**
 ```bash
 ./catlog nginx setup
 ```
@@ -124,56 +225,109 @@ This will:
 - Configure nginx as a reverse proxy
 - Update config.yml with `base_url: "/catlog"` and enable SSL
 - Set timezone to IST
+- Restart nginx
 
-### 2. Start Catlog
+6. **Start the server:**
 ```bash
 ./catlog start
 ```
 
-### 3. Access via Nginx
+7. **Access the application:**
 - HTTPS: `https://your-server-ip/catlog`
 - HTTP: `http://your-server-ip/catlog` (redirects to HTTPS)
 
 **Note:** Browser will show SSL warning for self-signed certificate. Click "Advanced" → "Proceed" to continue.
 
-## User Roles
+### Linux with Nginx Commands
 
-### Admin
-- Access to all log files
-- No path restrictions
+```bash
+./catlog install              # Install dependencies and build
+./catlog start                # Start the server
+./catlog stop                 # Stop the server
+./catlog status               # Check if running
+./catlog restart              # Restart the server
+./catlog update               # Update and rebuild
+./catlog uninstall            # Remove all files
 
-### Custom Roles
-- Define custom roles in config.yml
-- Restrict access to specific paths using wildcards
-- Example: `/var/log/nginx/*` allows all nginx logs
-
-## File Structure
-
-```
-loged/
-├── catlog                 # Main control script
-├── config.yml             # Configuration file
-├── example.config.yml     # Example configuration
-├── catlog-nginx           # Nginx configuration template
-├── src/
-│   ├── main.go            # Application source code
-│   ├── go.mod             # Go dependencies
-│   └── go.sum
-├── runtime/
-│   ├── catlog-server      # Compiled binary
-│   ├── catlog.pid         # Process ID
-│   └── catlog.log         # Log file
-└── README.md
+./catlog nginx setup          # Install nginx, generate SSL, and configure reverse proxy
+./catlog nginx restart        # Restart nginx
+./catlog nginx stop           # Stop nginx
+./catlog nginx remove         # Remove catlog nginx configuration
 ```
 
-## Security Considerations
+### Linux with Nginx Configuration
 
-- Change default passwords in config.yml
-- Use strong passwords for user accounts
-- When using nginx, always enable SSL
-- Restrict file access permissions in config.yml
-- Run on a secure network
-- For production, use proper SSL certificates (not self-signed)
+Edit `config.yml`:
+```yaml
+port: 8008
+base_url: "/catlog"           # Set to /catlog for nginx
+ssl:
+  enabled: true               # Enable SSL
+  cert_path: "/etc/ssl/certs/catlog.crt"
+  key_path: "/etc/ssl/private/catlog.key"
+auth:
+  enabled: true
+  users:
+    - username: "admin"
+      password: "catlog123"
+      role: "admin"
+    - username: "backend"
+      password: "backend123"
+      role: "backend"
+      allowed_paths:
+        - "/var/log/app/*"
+    - username: "devops"
+      password: "devops123"
+      role: "devops"
+      allowed_paths:
+        - "/var/log/nginx/*"
+        - "/var/log/syslog"
+log_files:
+  - name: "System Log"
+    path: "/var/log/syslog"
+  - name: "Nginx Access"
+    path: "/var/log/nginx/access.log"
+  - name: "Nginx Error"
+    path: "/var/log/nginx/error.log"
+```
+
+---
+
+## Configuration Reference
+
+### config.yml Options
+
+```yaml
+port: 8008                              # Port to run on
+base_url: ""                            # "" for localhost, "/catlog" for nginx
+ssl:
+  enabled: false                        # true when using nginx with SSL
+  cert_path: "/etc/ssl/certs/catlog.crt"
+  key_path: "/etc/ssl/private/catlog.key"
+auth:
+  enabled: true
+  users:
+    - username: "admin"
+      password: "admin123"
+      role: "admin"                     # admin has access to all logs
+      allowed_paths: []
+    - username: "user"
+      password: "user123"
+      role: "user"
+      allowed_paths:
+        - "/var/log/app/*"              # Supports wildcards
+        - "/var/log/nginx/*"
+log_files:
+  - name: "Display Name"
+    path: "/path/to/log/file"
+```
+
+### User Roles
+
+- **admin** - Access to all log files
+- **Custom roles** - Define custom roles with path restrictions
+
+---
 
 ## Troubleshooting
 
@@ -193,17 +347,19 @@ port: 8009
 - Ensure `base_url: "/catlog"` when using nginx
 - Check browser console for exact error
 
-### Nginx Issues
+### Nginx Issues (Linux)
 1. Check nginx status: `sudo systemctl status nginx`
 2. Test nginx config: `sudo nginx -t`
 3. Check nginx logs: `sudo tail -f /var/log/nginx/error.log`
 
-### SSL Certificate Issues
+### SSL Certificate Issues (Linux)
 Regenerate certificates:
 ```bash
 ./catlog nginx remove
 ./catlog nginx setup
 ```
+
+---
 
 ## Development
 
@@ -220,23 +376,18 @@ cd src
 go run main.go
 ```
 
-## Cross-Platform Support
+---
 
-### Windows
-- Install Go from https://golang.org/dl/
-- Run `./catlog install` (requires PowerShell or Git Bash)
-- Access at `http://localhost:8008`
+## Security Considerations
 
-### macOS
-- Install Go via Homebrew: `brew install go`
-- Run `./catlog install`
-- Access at `http://localhost:8008`
+- Change default passwords in config.yml
+- Use strong passwords for user accounts
+- When using nginx, always enable SSL
+- Restrict file access permissions in config.yml
+- Run on a secure network
+- For production, use proper SSL certificates (not self-signed)
 
-### Linux
-- Install Go: `sudo apt-get install golang-go` (or equivalent)
-- Run `./catlog install`
-- Access at `http://localhost:8008`
-- Optional: Run `./catlog nginx setup` for nginx reverse proxy
+---
 
 ## API Endpoints
 
@@ -250,6 +401,8 @@ go run main.go
 - `GET /logout` - Logout
 - `GET /app` - Log file list (requires authentication)
 - `GET /api/loadmore?file=<path>&offset=<n>&limit=<n>` - Load historical logs
+
+---
 
 ## License
 
