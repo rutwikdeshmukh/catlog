@@ -560,6 +560,12 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Only allow .log files
+	if !strings.HasSuffix(logPath, ".log") {
+		http.Error(w, "Only .log files are allowed", http.StatusForbidden)
+		return
+	}
+
 	// Check user access permissions
 	user := getUserFromContext(r)
 	if user != nil && !hasAccess(user, logPath) {
@@ -916,6 +922,12 @@ function logout() {
 		return
 	}
 
+	// Only allow .log files
+	if !strings.HasSuffix(logPath, ".log") {
+		http.Error(w, "Only .log files are allowed", http.StatusForbidden)
+		return
+	}
+
 	// Check if file exists
 	if _, err := os.Stat(logPath); os.IsNotExist(err) {
 		http.Error(w, "File not found: "+logPath, http.StatusNotFound)
@@ -1239,6 +1251,12 @@ func handleLoadMore(w http.ResponseWriter, r *http.Request) {
 
 	if logPath == "" {
 		http.Error(w, "file parameter required", http.StatusBadRequest)
+		return
+	}
+
+	// Only allow .log files
+	if !strings.HasSuffix(logPath, ".log") {
+		http.Error(w, "Only .log files are allowed", http.StatusForbidden)
 		return
 	}
 

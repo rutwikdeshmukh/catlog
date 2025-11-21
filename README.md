@@ -11,6 +11,7 @@ A lightweight, cross-platform log viewer application that streams log files in r
 - 🔒 Optional SSL/HTTPS support with nginx
 - 📊 Load historical log lines on demand
 - 🎯 Path-based access control for different users
+- 🛡️ Only `.log` files allowed - prevents unauthorized file access
 - ⚡ Lightweight and fast
 
 ---
@@ -380,10 +381,11 @@ go run main.go
 
 ## Security Considerations
 
+- **File Type Restriction** - Only `.log` files are allowed. Any attempt to access other file types will be rejected
 - Change default passwords in config.yml
 - Use strong passwords for user accounts
 - When using nginx, always enable SSL
-- Restrict file access permissions in config.yml
+- Restrict file access permissions in config.yml using role-based access control
 - Run on a secure network
 - For production, use proper SSL certificates (not self-signed)
 
