@@ -7,6 +7,94 @@ PIDFILE="$RUNTIME_DIR/catlog.pid"
 LOGFILE="$RUNTIME_DIR/catlog.log"
 BINARY="$RUNTIME_DIR/catlog-server"
 
+# Function to setup nginx
+setup_nginx() {
+    echo "🌐 Catlog - Nginx Setup"
+    echo "======================="
+    
+    # Check if running on Linux
+    if [[ "$OSTYPE" != "linux-gnu"* ]]; then
+        echo "❌ Nginx setup only works on Linux"
+        exit 1
+    fi
+    
+    # Check if nginx is installed
+    if ! command -v nginx &> /dev/null; then
+        echo "📦 Installing nginx..."
+        
+        if command -v apt-get &> /dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y nginx
+        elif command -v yum &> /dev/null; then
+            sudo yum install -y nginx
+        elif command -v dnf &> /dev/null; then
+            sudo dnf install -y nginx
+        else
+            echo "❌ Unsupported Linux distribution. Please install nginx manually."
+            exit 1
+        fi
+    fi
+    
+    echo "✅ Nginx is installed: $(nginx -v 2>&1)"
+    
+    # Get public IP
+    echo "🌐 Detecting public IP..."
+    PUBLIC_IP=$(curl -s ifconfig.me || curl -s ipinfo.io/ip || curl -s icanhazip.com || echo "127.0.0.1")
+    echo "📍 Detected public IP: $PUBLIC_IP"
+    
+    # Update config.yml with detected IP and enable SSL
+    if [ -f "config.yml" ]; then
+        sed -i "s/server_ip: .*/server_ip: \"$PUBLIC_IP\"/" config.yml
+        sed -i "s/base_url: .*/base_url: \"\/catlog\"/" config.yml
+        sed -i "s/ssl:/ssl:\n  enabled: true/" config.yml
+        echo "✅ Updated config.yml with server IP and base_url"
+    fi
+    
+    # Generate SSL certificate if it doesn't exist
+    if [ ! -f "/etc/ssl/certs/catlog.crt" ]; then
+        echo "🔒 Generating SSL certificate..."
+        sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+            -keyout /etc/ssl/private/catlog.key \
+            -out /etc/ssl/certs/catlog.crt \
+            -subj "/C=US/ST=State/L=City/O=Catlog/CN=$PUBLIC_IP" 2>/dev/null
+        
+        sudo chmod 600 /etc/ssl/private/catlog.key
+        sudo chmod 644 /etc/ssl/certs/catlog.crt
+        echo "✅ SSL certificate generated"
+    else
+        echo "✅ SSL certificate already exists"
+    fi
+    
+    # Create nginx config with dynamic IP
+    echo "🔧 Creating nginx configuration..."
+    sed "s/SERVER_IP/$PUBLIC_IP/g" catlog-nginx > /tmp/catlog-nginx-configured
+    sudo cp /tmp/catlog-nginx-configured /etc/nginx/sites-available/catlog
+    rm /tmp/catlog-nginx-configured
+    
+    sudo ln -sf /etc/nginx/sites-available/catlog /etc/nginx/sites-enabled/catlog
+    
+    # Test nginx config
+    if sudo nginx -t 2>/dev/null; then
+        echo "✅ Nginx configuration is valid"
+    else
+        echo "❌ Nginx configuration has errors"
+        exit 1
+    fi
+    
+    # Restart nginx
+    sudo systemctl restart nginx 2>/dev/null || sudo service nginx restart 2>/dev/null || sudo nginx -s reload 2>/dev/null || echo "⚠️  Please restart nginx manually"
+    echo "✅ Nginx restarted"
+    
+    # Setup timezone
+    echo "🕐 Setting timezone to IST..."
+    sudo timedatectl set-timezone Asia/Kolkata 2>/dev/null || echo "⚠️  Could not set timezone automatically"
+    
+    echo ""
+    echo "🎉 Nginx setup complete!"
+    echo "📍 Access via: https://$PUBLIC_IP/catlog"
+    echo "⚠️  Browser will show security warning - click 'Advanced' → 'Proceed'"
+}
+
 # Function to install and build
 install_and_build() {
     echo "🚀 Catlog - Lightweight Log Viewer Setup"
@@ -15,46 +103,27 @@ install_and_build() {
     # Create runtime directory
     mkdir -p "$RUNTIME_DIR"
 
-    # Check what needs to be installed (Linux only - nginx not installed on Windows/macOS)
+    # Check what needs to be installed
     NEED_GO=false
-    NEED_NGINX=false
     
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         if ! command -v go &> /dev/null; then
             NEED_GO=true
         fi
-        if ! command -v nginx &> /dev/null; then
-            NEED_NGINX=true
-        fi
         
-        # Install packages if needed
-        if [[ "$NEED_GO" == true ]] || [[ "$NEED_NGINX" == true ]]; then
-            echo "📦 Installing packages..."
+        # Install Go if needed
+        if [[ "$NEED_GO" == true ]]; then
+            echo "📦 Installing Go..."
             
             if command -v apt-get &> /dev/null; then
                 sudo apt-get update -qq
-                if [[ "$NEED_GO" == true ]]; then
-                    sudo apt-get install -y golang-go
-                fi
-                if [[ "$NEED_NGINX" == true ]]; then
-                    sudo apt-get install -y nginx
-                fi
+                sudo apt-get install -y golang-go
             elif command -v yum &> /dev/null; then
-                if [[ "$NEED_GO" == true ]]; then
-                    sudo yum install -y golang
-                fi
-                if [[ "$NEED_NGINX" == true ]]; then
-                    sudo yum install -y nginx
-                fi
+                sudo yum install -y golang
             elif command -v dnf &> /dev/null; then
-                if [[ "$NEED_GO" == true ]]; then
-                    sudo dnf install -y golang
-                fi
-                if [[ "$NEED_NGINX" == true ]]; then
-                    sudo dnf install -y nginx
-                fi
+                sudo dnf install -y golang
             else
-                echo "❌ Unsupported Linux distribution. Please install Go and nginx manually."
+                echo "❌ Unsupported Linux distribution. Please install Go manually."
                 exit 1
             fi
         fi
@@ -90,59 +159,6 @@ install_and_build() {
 
     # Make it executable
     chmod +x "$BINARY"
-
-    # Setup nginx reverse proxy (Linux only)
-    if [[ "$OSTYPE" == "linux-gnu"* ]] && command -v nginx &> /dev/null; then
-        echo "🌐 Setting up nginx reverse proxy..."
-        
-        # Set timezone to IST for consistent logging
-        echo "🕐 Setting timezone to IST..."
-        sudo timedatectl set-timezone Asia/Kolkata 2>/dev/null || echo "⚠️  Could not set timezone automatically"
-        
-        # Get public IP dynamically
-        PUBLIC_IP=$(curl -s ifconfig.me || curl -s ipinfo.io/ip || curl -s icanhazip.com || echo "127.0.0.1")
-        echo "📍 Detected public IP: $PUBLIC_IP"
-        
-        # Update config.yml with detected IP
-        if [ -f "config.yml" ]; then
-            sed -i "s/server_ip: .*/server_ip: \"$PUBLIC_IP\"/" config.yml
-            echo "✅ Updated config.yml with server IP"
-        fi
-        
-        # Generate SSL certificate if it doesn't exist
-        SSL_GENERATED=false
-        if [ ! -f "/etc/ssl/certs/catlog.crt" ]; then
-            echo "🔒 Generating SSL certificate..."
-            sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-                -keyout /etc/ssl/private/catlog.key \
-                -out /etc/ssl/certs/catlog.crt \
-                -subj "/C=US/ST=State/L=City/O=Catlog/CN=$PUBLIC_IP" 2>/dev/null
-            
-            sudo chmod 600 /etc/ssl/private/catlog.key
-            sudo chmod 644 /etc/ssl/certs/catlog.crt
-            SSL_GENERATED=true
-            echo "✅ SSL certificate generated"
-        else
-            echo "✅ SSL certificate already exists"
-        fi
-        
-        # Create nginx config with dynamic IP
-        sed "s/SERVER_IP/$PUBLIC_IP/g" catlog-nginx > /tmp/catlog-nginx-configured
-        sudo cp /tmp/catlog-nginx-configured /etc/nginx/sites-available/catlog
-        rm /tmp/catlog-nginx-configured
-        
-        sudo ln -sf /etc/nginx/sites-available/catlog /etc/nginx/sites-enabled/catlog
-        
-        # Restart nginx only if SSL was newly generated, otherwise just reload
-        if [ "$SSL_GENERATED" = true ]; then
-            sudo systemctl restart nginx 2>/dev/null || sudo service nginx restart 2>/dev/null || sudo nginx -s reload 2>/dev/null || echo "⚠️  Please restart nginx manually"
-        else
-            sudo nginx -s reload 2>/dev/null || sudo systemctl reload nginx 2>/dev/null || echo "⚠️  Please reload nginx manually"
-        fi
-        echo "✅ Nginx reverse proxy configured with SSL"
-        echo "📍 Access via: https://$PUBLIC_IP/catlog"
-        echo "⚠️  Browser will show security warning - click 'Advanced' → 'Proceed'"
-    fi
 
     # Setup auto-start on boot (Linux only)
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -259,48 +275,12 @@ case "$1" in
             exit 1
         fi
         
-        echo "🔄 Restarting Catlog with IP detection..."
+        echo "🔄 Restarting Catlog..."
         
         # Stop current service
         $0 stop
         
-        # Detect current IP
-        echo "🌐 Detecting public IP..."
-        NEW_IP=$(curl -s ifconfig.me || curl -s ipinfo.io/ip || curl -s icanhazip.com || echo "127.0.0.1")
-        echo "📍 Current IP: $NEW_IP"
-        
-        # Update config.yml with new IP
-        if [ -f "config.yml" ]; then
-            sed -i "s/server_ip: .*/server_ip: \"$NEW_IP\"/" config.yml
-            echo "✅ Updated config.yml with new IP"
-        fi
-        
-        # Linux-specific SSL and nginx updates
-        if [[ "$OSTYPE" == "linux-gnu"* ]] && command -v nginx &> /dev/null; then
-            # Regenerate SSL certificates
-            echo "🔒 Regenerating SSL certificates..."
-            sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-                -keyout /etc/ssl/private/catlog.key \
-                -out /etc/ssl/certs/catlog.crt \
-                -subj "/C=US/ST=State/L=City/O=Catlog/CN=$NEW_IP" 2>/dev/null
-            
-            sudo chmod 600 /etc/ssl/private/catlog.key
-            sudo chmod 644 /etc/ssl/certs/catlog.crt
-            echo "✅ SSL certificates regenerated"
-            
-            # Update nginx config
-            echo "🌐 Updating nginx configuration..."
-            sed "s/SERVER_IP/$NEW_IP/g" catlog-nginx > /tmp/catlog-nginx-configured
-            sudo cp /tmp/catlog-nginx-configured /etc/nginx/sites-available/catlog
-            rm /tmp/catlog-nginx-configured
-            
-            # Ensure nginx site is enabled
-            sudo ln -sf /etc/nginx/sites-available/catlog /etc/nginx/sites-enabled/catlog
-            
-            # Reload nginx
-            sudo nginx -s reload 2>/dev/null || sudo systemctl reload nginx 2>/dev/null || echo "⚠️  Please reload nginx manually"
-            echo "✅ Nginx updated and reloaded"
-        fi
+        sleep 2
         
         # Start catlog
         echo "🚀 Starting Catlog..."
@@ -308,8 +288,6 @@ case "$1" in
         
         echo ""
         echo "🎉 Catlog restarted successfully!"
-        echo "📍 Access via: https://$NEW_IP/login"
-        echo "📍 Or via HTTP: http://$NEW_IP/login"
         ;;
     
     update)
@@ -325,29 +303,6 @@ case "$1" in
         sleep 2
         install_and_build
         
-        # Always update nginx config if on Linux
-        if [[ "$OSTYPE" == "linux-gnu"* ]] && command -v nginx &> /dev/null; then
-            echo "🌐 Updating nginx configuration..."
-            
-            # Set timezone to IST for consistent logging
-            echo "🕐 Setting timezone to IST..."
-            sudo timedatectl set-timezone Asia/Kolkata 2>/dev/null || echo "⚠️  Could not set timezone automatically"
-            
-            # Get public IP dynamically
-            PUBLIC_IP=$(curl -s ifconfig.me || curl -s ipinfo.io/ip || curl -s icanhazip.com || echo "127.0.0.1")
-            
-            # Create nginx config with dynamic IP
-            sed "s/SERVER_IP/$PUBLIC_IP/g" catlog-nginx > /tmp/catlog-nginx-configured
-            sudo cp /tmp/catlog-nginx-configured /etc/nginx/sites-available/catlog
-            rm /tmp/catlog-nginx-configured
-            
-            if [ ! -L /etc/nginx/sites-enabled/catlog ]; then
-                sudo ln -s /etc/nginx/sites-available/catlog /etc/nginx/sites-enabled/catlog
-            fi
-            sudo nginx -s reload 2>/dev/null || sudo systemctl reload nginx 2>/dev/null || echo "⚠️  Please reload nginx manually"
-            echo "✅ Nginx configuration updated"
-        fi
-        
         echo ""
         echo "🚀 Starting updated server..."
         $0 start
@@ -358,19 +313,6 @@ case "$1" in
         
         # Stop server if running
         $0 stop 2>/dev/null || true
-        
-        # Remove nginx configuration
-        if [[ "$OSTYPE" == "linux-gnu"* ]] && command -v nginx &> /dev/null; then
-            echo "🌐 Removing nginx configuration..."
-            sudo rm -f /etc/nginx/sites-enabled/catlog
-            sudo rm -f /etc/nginx/sites-available/catlog
-            sudo nginx -s reload 2>/dev/null || sudo systemctl reload nginx 2>/dev/null || true
-        fi
-        
-        # Remove SSL certificates
-        echo "🔒 Removing SSL certificates..."
-        sudo rm -f /etc/ssl/certs/catlog.crt
-        sudo rm -f /etc/ssl/private/catlog.key
         
         # Remove auto-start crontab entry (Linux only)
         if [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -392,8 +334,36 @@ case "$1" in
         rm -f catlog.log catlog.pid
         
         echo "✅ Catlog uninstalled successfully"
-        echo "📝 Note: Go and nginx packages were not removed"
+        echo "📝 Note: Go package was not removed"
         echo "📝 Note: config.yml was preserved"
+        ;;
+    
+    nginx)
+        case "$2" in
+            setup)
+                setup_nginx
+                ;;
+            restart)
+                echo "🔄 Restarting nginx..."
+                sudo systemctl restart nginx 2>/dev/null || sudo service nginx restart 2>/dev/null || sudo nginx -s reload 2>/dev/null
+                echo "✅ Nginx restarted"
+                ;;
+            stop)
+                echo "🛑 Stopping nginx..."
+                sudo systemctl stop nginx 2>/dev/null || sudo service nginx stop 2>/dev/null || sudo nginx -s stop 2>/dev/null
+                echo "✅ Nginx stopped"
+                ;;
+            remove)
+                echo "🗑️ Removing nginx configuration..."
+                sudo rm -f /etc/nginx/sites-enabled/catlog
+                sudo rm -f /etc/nginx/sites-available/catlog
+                sudo systemctl restart nginx 2>/dev/null || sudo service nginx restart 2>/dev/null || sudo nginx -s reload 2>/dev/null || true
+                echo "✅ Nginx configuration removed"
+                ;;
+            *)
+                echo "Usage: catlog nginx {setup|restart|stop|remove}"
+                ;;
+        esac
         ;;
     
     ""|install)
@@ -402,19 +372,28 @@ case "$1" in
         echo "🎉 Installation complete!"
         echo "📍 Run 'catlog start' to start the server"
         echo "📍 Run 'catlog stop' to stop the server"
+        echo "📍 For nginx setup, run './catlog nginx setup'"
         ;;
     
     *)
-        echo "Usage: catlog {start|stop|status|install|update|restart|uninstall}"
+        echo "Usage: catlog {start|stop|status|install|update|restart|uninstall|nginx}"
         echo ""
         echo "Commands:"
-        echo "  start     - Start Catlog server in background"
-        echo "  stop      - Stop Catlog server"
-        echo "  status    - Check if Catlog is running"
-        echo "  install   - Install dependencies and build"
-        echo "  update    - Stop, rebuild, and restart server"
-        echo "  restart   - Restart with IP detection and SSL regeneration"
-        echo "  uninstall - Remove all catlog files and configurations"
+        echo "  start              - Start Catlog server in background"
+        echo "  stop               - Stop Catlog server"
+        echo "  status             - Check if Catlog is running"
+        echo "  install            - Install dependencies and build"
+        echo "  update             - Stop, rebuild, and restart server"
+        echo "  restart            - Restart the server"
+        echo "  uninstall          - Remove all catlog files and configurations"
+        echo ""
+        echo "Nginx Commands (Linux only):"
+        echo "  nginx setup        - Install nginx, generate SSL, and configure reverse proxy"
+        echo "  nginx restart      - Restart nginx"
+        echo "  nginx stop         - Stop nginx"
+        echo "  nginx remove       - Remove catlog nginx configuration"
         exit 1
         ;;
 esac
+
+

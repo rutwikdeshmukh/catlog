@@ -20,8 +20,9 @@ import (
 )
 
 type Config struct {
-	Port int `yaml:"port"`
-	Auth struct {
+	Port    int    `yaml:"port"`
+	BaseURL string `yaml:"base_url"`
+	Auth    struct {
 		Enabled bool `yaml:"enabled"`
 		Users   []struct {
 			Username     string   `yaml:"username"`
@@ -30,6 +31,11 @@ type Config struct {
 			AllowedPaths []string `yaml:"allowed_paths"`
 		} `yaml:"users"`
 	} `yaml:"auth"`
+	SSL struct {
+		Enabled  bool   `yaml:"enabled"`
+		CertPath string `yaml:"cert_path"`
+		KeyPath  string `yaml:"key_path"`
+	} `yaml:"ssl"`
 	LogFiles []struct {
 		Path string `yaml:"path"`
 		Name string `yaml:"name"`
@@ -620,19 +626,12 @@ func handleWebSocket(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleLanding(w http.ResponseWriter, r *http.Request) {
-	// Get base path for URLs (detect if behind reverse proxy)
-	basePath := ""
-	originalURI := r.Header.Get("X-Original-URI")
-	if originalURI != "" && strings.HasPrefix(originalURI, "/catlog") {
-		basePath = "/catlog"
-	}
-
 	w.Header().Set("Content-Type", "text/html")
 	fmt.Fprintf(w, `
 <!DOCTYPE html>
 <html>
 <head>
-<title>Catlog - Log Viewer</title>
+<title>Catlog - Real-time Log Viewer</title>
 <link rel="icon" type="image/png" href="/catlog.png">
 <style>
 * { box-sizing: border-box; }
@@ -701,12 +700,11 @@ body {
         <img src="/catlog.png" alt="catlog" style="height: 200px; width: auto;">
     </div>
     <p class="subtitle">Real-time log streaming for your server - monitor log files instantly through your browser</p>
-
+    
     <div class="ssl-warning">
-        <h3>SSL Certificate Notice</h3>
-        <p>This server uses a self-signed SSL certificate for secure connections.</p>
-        <p>Your browser may show a security warning - this is normal and expected.</p>
-        <p>Click "Advanced" >> "Proceed to site" to continue safely.</p>
+        <h3>Getting Started</h3>
+        <p>Click the button below to access the log viewer.</p>
+        <p>Login with your credentials to view logs.</p>
     </div>
     
     <button class="proceed-btn" onclick="proceedToApp()">Proceed to Log Viewer</button>
@@ -714,26 +712,21 @@ body {
 
 <script>
 function proceedToApp() {
-    const protocol = 'https:';
-    const host = window.location.host;
-    const basePath = '%s';
-    const appPath = basePath ? basePath + '/app' : '/app';
-    window.location.href = protocol + '//' + host + appPath;
+    window.location.href = '/app';
 }
 </script>
 </body>
-</html>`, basePath)
+</html>`)
 }
 
 func handleIndex(w http.ResponseWriter, r *http.Request) {
 	logPath := r.URL.Query().Get("file")
 	log.Printf("HTTP request for path: %s, file param: %s", r.URL.Path, logPath)
 
-	// Get base path for URLs (detect if behind reverse proxy)
+	// Use base URL from config
 	basePath := "/app"
-	originalURI := r.Header.Get("X-Original-URI")
-	if originalURI != "" && strings.HasPrefix(originalURI, "/catlog") {
-		basePath = "/catlog/app"
+	if config.BaseURL != "" {
+		basePath = config.BaseURL + "/app"
 	}
 
 	if logPath == "" {
@@ -1107,10 +1100,10 @@ h1 {
 <script>
 console.log('Connecting to WebSocket...');
 const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-const basePath = '%s';
-// WebSocket endpoint is always /ws, not /app/ws
-const wsPath = basePath && basePath.includes('/catlog') ? '/catlog/ws' : '/ws';
-const ws = new WebSocket(wsProtocol + '//' + location.host + wsPath + '?file=%s');
+const configBasePath = '%s';
+const wsPath = configBasePath ? configBasePath + '/ws' : '/ws';
+const logFile = '%s';
+const ws = new WebSocket(wsProtocol + '//' + location.host + wsPath + '?file=' + encodeURIComponent(logFile));
 const logs = document.getElementById('logs');
 const status = document.getElementById('status');
 const loadMoreBtn = document.getElementById('loadMoreBtn');
@@ -1194,8 +1187,8 @@ function loadMore() {
     loadMoreBtn.textContent = 'Loading...';
 
     // Request more lines from server
-    const apiPath = basePath && basePath.includes('/catlog') ? '/catlog/api/loadmore' : '/api/loadmore';
-    fetch(apiPath + '?file=%s&offset=' + (totalLines - shownLines - 100) + '&limit=100')
+    const apiPath = configBasePath ? configBasePath + '/api/loadmore' : '/api/loadmore';
+    fetch(apiPath + '?file=' + encodeURIComponent(logFile) + '&offset=' + (totalLines - shownLines - 100) + '&limit=100')
         .then(response => response.json())
         .then(data => {
             const scrollPos = logs.scrollTop;
@@ -1236,7 +1229,7 @@ function logout() {
 }
 </script>
 </body>
-</html>`, filename, basePath, filename, basePath, logPath, logPath)
+</html>`, filename, basePath, filename, config.BaseURL, logPath)
 }
 
 func handleLoadMore(w http.ResponseWriter, r *http.Request) {
@@ -1314,6 +1307,7 @@ func main() {
 	if err := loadConfig(); err != nil {
 		log.Printf("Warning: Could not load config.yml: %v", err)
 		config.Port = 8008 // Default port
+		config.BaseURL = ""
 	}
 
 	// Override port if provided via command line
@@ -1330,6 +1324,9 @@ func main() {
 	http.HandleFunc("/api/loadmore", requireAuth(handleLoadMore))
 
 	fmt.Printf("Catlog server starting on port %d\n", config.Port)
+	if config.BaseURL != "" {
+		fmt.Printf("Base URL: %s\n", config.BaseURL)
+	}
 	if config.Auth.Enabled {
 		fmt.Printf("Authentication enabled - %d users configured\n", len(config.Auth.Users))
 		for _, user := range config.Auth.Users {
@@ -1340,5 +1337,9 @@ func main() {
 	}
 	fmt.Printf("Open http://localhost:%d in your browser\n", config.Port)
 
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", config.Port), nil))
+	if config.SSL.Enabled {
+		log.Fatal(http.ListenAndServeTLS(fmt.Sprintf(":%d", config.Port), config.SSL.CertPath, config.SSL.KeyPath, nil))
+	} else {
+		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", config.Port), nil))
+	}
 }

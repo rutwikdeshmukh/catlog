@@ -1,106 +1,57 @@
-<div align="center">
-  <img src="src/catlog.png" alt="Catlog Logo" width="120" height="120">
-</div>
+# Catlog - Real-time Log Viewer
 
-# catlog
+A lightweight, cross-platform log viewer application that streams log files in real-time through your browser. Works on Windows, macOS, and Linux with optional nginx reverse proxy support.
 
-A lightweight, real-time log streaming tool for Linux servers built with AI.
+## Features
 
-## About
+- 🚀 Real-time log streaming via WebSocket
+- 🔐 User authentication with role-based access control
+- 🌐 Works on Windows, macOS, and Linux
+- 📱 Responsive web interface with VS Code Dark Modern theme
+- 🔒 Optional SSL/HTTPS support with nginx
+- 📊 Load historical log lines on demand
+- 🎯 Path-based access control for different users
+- ⚡ Lightweight and fast
 
-Catlog is an open-source, minimal log viewer that runs entirely on your server without requiring external backends or databases. It provides a web-based interface for monitoring log files in real-time, accessible from any browser.
+## Quick Start
 
-### Features
-- **Real-Time Log Streaming** via Secure WebSocket Connections
-- **Multi-User Authentication** with role-based access control
-- **Web-based Interface** accessible from any browser
-- **Multiple Log Files Support** - each file opens in separately
-- **Minimal Resource Footprint** - single Go binary, ~1000 lines of code
-- **No External Dependencies** - no databases or centralized services required
-- **Configuration-Driven** - manage users and log files via single configuration file
-- **Supports Pagination** - loads last 200 lines by default, load more on demand
-- **Nginx with SSL** - automatic setup with SSL-ready configuration
-- **Rate Limiting** - protection against excessive requests and web crawlers/bots
-- **Custom Timezone Support** - logs displayed in configured timezone
-- **Auto-start on Boot** - automatically restarts after server reboot (Linux)
+### Prerequisites
+- Go 1.16+ installed
 
-### Supported Operating Systems
-- Linux
+### Local Development (Windows/macOS/Linux)
 
-### Stack
-- Go
-- Nginx
-
-### Target Audience
-- Developers and DevOps engineers needing quick log visibility
-- System administrators managing small to medium servers
-- Teams using low-resource environments where Elastic Stack is overkill
-- Anyone wanting simple, fast log monitoring without heavy setup
-
-## Installation
-
-### One-Command Installation and Startup for DEV (Linux/macOS/WSL)
-
+1. **Clone and setup:**
 ```bash
-git clone https://github.com/rutwikdeshmukh/catlog && cd catlog && chmod +x catlog && cp ./example.config.yml ./config.yml && ./catlog install  && ./catlog start
+cd loged
+cp example.config.yml config.yml
 ```
 
-This will automatically:
-- Install Go if needed
-- Install nginx if needed (Linux only)
-- Build the application
-- Configure nginx reverse proxy with rate limiting
-- Set up IST timezone
-- **Configure auto-start on server reboot (Linux only)**
-- Set up everything for production use
-
-### Manual Installation
-
-1. **Install Go 1.21+** from https://golang.org/dl/
-2. **Run:**
-   ```bash
-   git clone https://github.com/rutwikdeshmukh/catlog
-   cd catlog
-   chmod +x catlog
-   ./catlog install
-   ```
-
-<!-- ### Windows Installation
-
-1. **Install Go** from https://golang.org/dl/ (download the .msi installer)
-2. **Clone and build:**
-   ```bash
-   git clone https://github.com/rutwikdeshmukh/catlog
-   cd catlog
-   go mod tidy
-   go build -o runtime/catlog-server.exe src/main.go
-   ``` -->
-
-## Usage
-
-### Commands
-
+2. **Install and build:**
 ```bash
-./catlog install    # Install dependencies and build (one-time setup)
-./catlog start      # Start server in background
-./catlog stop       # Stop server
-./catlog status     # Check if server is running
-./catlog update     # Stop, rebuild, and restart server
-./catlog restart    # Restart with IP detection and SSL regeneration
-./catlog uninstall  # Remove all catlog files and configurations
+./catlog install
 ```
 
-### Configuration
+3. **Start the server:**
+```bash
+./catlog start
+```
 
-Edit `config.yml` to customize users, log files, port, and authentication:
+4. **Access the application:**
+Open your browser and go to: `http://localhost:8008`
+
+Default credentials:
+- Username: `admin`
+- Password: `catlog123`
+
+## Configuration
+
+### config.yml
 
 ```yaml
-# Configuration file for the log monitoring application
-port: 8008
-server_ip: "127.0.0.1"  # Auto-updated by restart command
-timezone: "Asia/Kolkata"  # IST timezone for logs and timestamps
+port: 8008                    # Port to run on
+base_url: ""                  # Leave empty for localhost, or set to "/catlog" for nginx
 ssl:
-  enabled: true
+  enabled: false              # Set to true when using nginx with SSL
   cert_path: "/etc/ssl/certs/catlog.crt"
   key_path: "/etc/ssl/private/catlog.key"
 auth:
@@ -108,155 +59,202 @@ auth:
   users:
     - username: "admin"
       password: "catlog123"
-      role: "admin"  # admin has access to all logs
-    - username: "BEDeveloper"
-      password: "backend123"
-      role: "backend"
+      role: "admin"           # admin has access to all logs
+      allowed_paths: []
+    - username: "user"
+      password: "password"
+      role: "user"
       allowed_paths:
-        - "/var/log/supervisor/*"
-        - "/var/log/app/*"
-        - "./runtime/catlog.log"
-    - username: "FEDeveloper"
-      password: "frontend123"
-      role: "frontend"
-      allowed_paths:
-        - "/var/log/nginx/*"
-        - "/var/log/apache2/*"
-    - username: "DevOps"
-      password: "devops123"
-      role: "devops"
-      allowed_paths:
-        - "/var/log/syslog"
-        - "/var/log/auth.log"
+        - "/var/log/app/*"    # Supports wildcards
         - "/var/log/nginx/*"
 log_files:
-  - name: "Sample Log"
-    path: "./src/sample.log"
+  - name: "Application Log"
+    path: "./runtime/catlog.log"
   - name: "System Log"
     path: "/var/log/syslog"
-  - name: "Nginx Access Log"
-    path: "/var/log/nginx/catlog_access.log"
-  - name: "Nginx SSL Access Log"
-    path: "/var/log/nginx/catlog_ssl_access.log"
-  - name: "Nginx Error Log"
-    path: "/var/log/nginx/error.log"
-  - name: "Catlog Log"
-    path: "./runtime/catlog.log"
 ```
 
-### RBAC
-- `admin` role has access to all logs
-- Other roles have restricted access based on `allowed_paths` in `config.yml`
-- Supports wildcard patterns (e.g., `/var/log/nginx/*`)
-- Session-based authentication with login/logout
+### Base URL Configuration
 
-**Note:** Change the default credentials before deploying to production.
+**For Local Development:**
+```yaml
+base_url: ""
+```
+Access at: `http://localhost:8008`
 
-### Server Restart Handling
+**For Nginx Reverse Proxy:**
+```yaml
+base_url: "/catlog"
+```
+Access at: `https://your-server/catlog`
 
-The `restart` command automatically handles server IP changes:
+## Usage
+
+### Catlog Commands
 
 ```bash
-./catlog restart    # Detects new IP, regenerates SSL, updates nginx
+./catlog install              # Install dependencies and build
+./catlog start                # Start the server
+./catlog stop                 # Stop the server
+./catlog status               # Check if running
+./catlog restart              # Restart the server
+./catlog update               # Update and rebuild
+./catlog uninstall            # Remove all files
 ```
 
-**What it does:**
-- Detects current public IP address
-- Updates `server_ip` in config.yml
-- Regenerates SSL certificates with new IP
-- Updates nginx configuration
-- Reloads nginx and restarts catlog
+### Nginx Commands (Linux only)
 
-**Auto-start on boot:**
-Auto-start is automatically configured during installation. If you need to set it up manually:
 ```bash
-crontab -e
-@reboot sleep 60 && cd /path/to/catlog && ./catlog restart
+./catlog nginx setup          # Install nginx, generate SSL, and configure reverse proxy
+./catlog nginx restart        # Restart nginx
+./catlog nginx stop           # Stop nginx
+./catlog nginx remove         # Remove catlog nginx configuration
 ```
 
-### Rate Limiting
-Automatic rate limiting is configured:
-- General endpoints: 60 requests/minute
-- API endpoints: 30 requests/minute
-- Burst protection included
+## Server Setup with Nginx
 
-### Accessing the Interface
+### 1. Setup Nginx
+```bash
+./catlog nginx setup
+```
 
-1. **Visit login page:** `https://<your-server-ip>/login`
-2. **Login with credentials** from config.yml
-3. **Browse available logs** based on your user permissions
-4. **Click logout** for clean session termination
+This will:
+- Install nginx (if not already installed)
+- Generate self-signed SSL certificates
+- Configure nginx as a reverse proxy
+- Update config.yml with `base_url: "/catlog"` and enable SSL
+- Set timezone to IST
 
-### Using the Interface
+### 2. Start Catlog
+```bash
+./catlog start
+```
 
-1. **Login** with your username and password
-2. **Select log files** from your available list (filtered by permissions)
-3. **Real-time monitoring:**
-   - Logs stream in real-time
-   - Shows last 200 lines by default
-   - Click "Load 100 More Lines" to see older entries
-   - Error keywords highlighted in red
-   - Open multiple tabs for different log files
-4. **Logout** cleanly using the logout button
+### 3. Access via Nginx
+- HTTPS: `https://your-server-ip/catlog`
+- HTTP: `http://your-server-ip/catlog` (redirects to HTTPS)
 
-## Production Deployment
+**Note:** Browser will show SSL warning for self-signed certificate. Click "Advanced" → "Proceed" to continue.
 
-### Security Recommendations
-1. **Change Default Credentials** in config.yml to **Stronger Credentials**
-2. **Use HTTPS** - Use domain specific SSL certificates generated by a trusted CA
-3. **Configure User Permissions** - Restrict access to specific log directories
-4. **Firewall Rules** - Limit access to specific IPs
-5. **Run as Dedicated User** with minimal permissions
+## User Roles
 
-## Resource Utilization
+### Admin
+- Access to all log files
+- No path restrictions
 
-### CPU & Memory Usage
-
-#### **Installation (`./catlog install`)**
-- **CPU**: 50-80% of total system capacity for 30-60 seconds (Parallel Compilation Behavior: Go uses multiple/all available cores automatically)
-  - Single vCPU: 80-100% of that core (60-120 seconds)
-  - Multi-vCPU: Distributed across cores (30-60 seconds)
-- **Memory**: 200-500MB peak during Go compilation
-
-#### **Runtime (`./catlog start`)**
-- **CPU**: 1-5% continuous during active log streaming
-- **Memory**: 20-35MB steady state (Single User)
-- **Idle**: <1% CPU, 20-25MB memory
-
-#### **Updates (`./catlog update`)**
-- **CPU**: 40-70% for 45-90 seconds (Rebuild Process)
-- **Memory**: 200-400MB peak
-
-### Resource Efficiency
-- **Lightweight**: Single Go binary (~5-10MB)
-- **No database**: Minimal Dependencies
-- **Scalable**: Memory usage scales with active connections
-- **VPS friendly**: Suitable for small instances (1GB RAM+)
+### Custom Roles
+- Define custom roles in config.yml
+- Restrict access to specific paths using wildcards
+- Example: `/var/log/nginx/*` allows all nginx logs
 
 ## File Structure
 
 ```
-catlog/
-├── README.md          # Documentation for this project
-├── LICENSE            # License
-├── config.yml         # Configuration file based on example.config.yml
-├── example.config.yml # Example configuration
-├── catlog              # Installation and Control Script
-├── catlog-nginx        # Nginx configuration
-├── .gitattributes     # Defines how the contents stored in the repository are copied to the working tree
-├── .gitignore         # Git ignore rules
-├── src/               # Source code directory
-│   ├── main.go        # Complete server implementation
-│   ├── go.mod         # Go module dependencies
-│   ├── go.sum         # Go dependency checksums
-│   └── sample.log     # Test log file
-└── runtime/           # Generated files (created automatically)
-    ├── catlog-server   # Built binary
-    ├── catlog.pid      # Process ID file (when running)
-    └── catlog.log      # Server logs (when running)
+loged/
+├── catlog                 # Main control script
+├── config.yml             # Configuration file
+├── example.config.yml     # Example configuration
+├── catlog-nginx           # Nginx configuration template
+├── src/
+│   ├── main.go            # Application source code
+│   ├── go.mod             # Go dependencies
+│   └── go.sum
+├── runtime/
+│   ├── catlog-server      # Compiled binary
+│   ├── catlog.pid         # Process ID
+│   └── catlog.log         # Log file
+└── README.md
 ```
-## Total Hours Spent on this Idea
+
+## Security Considerations
+
+- Change default passwords in config.yml
+- Use strong passwords for user accounts
+- When using nginx, always enable SSL
+- Restrict file access permissions in config.yml
+- Run on a secure network
+- For production, use proper SSL certificates (not self-signed)
+
+## Troubleshooting
+
+### Port Already in Use
+Change the port in config.yml:
+```yaml
+port: 8009
 ```
-20
+
+### Cannot Access Application
+1. Check if server is running: `./catlog status`
+2. Check logs: `tail -f runtime/catlog.log`
+3. Verify config.yml exists and is valid
+
+### WebSocket Connection Failed
+- Ensure `base_url` is empty for localhost
+- Ensure `base_url: "/catlog"` when using nginx
+- Check browser console for exact error
+
+### Nginx Issues
+1. Check nginx status: `sudo systemctl status nginx`
+2. Test nginx config: `sudo nginx -t`
+3. Check nginx logs: `sudo tail -f /var/log/nginx/error.log`
+
+### SSL Certificate Issues
+Regenerate certificates:
+```bash
+./catlog nginx remove
+./catlog nginx setup
 ```
-Update the counter like a message smeared on a wall with blood to let others know how much efforts have been made :)
+
+## Development
+
+### Building Locally
+```bash
+cd src
+go build -o ../runtime/catlog-server main.go
+cd ..
+```
+
+### Running in Development Mode
+```bash
+cd src
+go run main.go
+```
+
+## Cross-Platform Support
+
+### Windows
+- Install Go from https://golang.org/dl/
+- Run `./catlog install` (requires PowerShell or Git Bash)
+- Access at `http://localhost:8008`
+
+### macOS
+- Install Go via Homebrew: `brew install go`
+- Run `./catlog install`
+- Access at `http://localhost:8008`
+
+### Linux
+- Install Go: `sudo apt-get install golang-go` (or equivalent)
+- Run `./catlog install`
+- Access at `http://localhost:8008`
+- Optional: Run `./catlog nginx setup` for nginx reverse proxy
+
+## API Endpoints
+
+### WebSocket
+- `ws://localhost:8008/ws?file=<path>` - Real-time log streaming
+
+### HTTP
+- `GET /` - Landing page
+- `GET /login` - Login page
+- `POST /login` - Login submission
+- `GET /logout` - Logout
+- `GET /app` - Log file list (requires authentication)
+- `GET /api/loadmore?file=<path>&offset=<n>&limit=<n>` - Load historical logs
+
+## License
+
+See LICENSE file for details.
+
+## Support
+
+For issues or questions, please check the configuration or create an issue in the repository.
