@@ -14,6 +14,11 @@ jobs:
     timeout-minutes: 10
 
     steps:
+      - name: CHECKOUT CODE (FULL)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # IMPORTANT: required so all tags are available
+
       - name: CHECK TAG VALIDITY
         run: |
           if git tag | grep -q "${{ github.event.inputs.gitTagName }}"; then
@@ -23,7 +28,7 @@ jobs:
             exit 1
           fi
 
-      - name: PULL CODE
+      - name: PULL TAG SPECIFIC CODE
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.gitTagName }}
