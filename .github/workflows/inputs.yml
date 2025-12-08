@@ -1,7 +1,7 @@
 name: TEST
 run-name: Deployment number ${{ github.run_number }} initiated by ${{github.actor}}
 
-permissioms:
+permissions:
   contents: write
   id-token: write
 
