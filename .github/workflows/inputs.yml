@@ -38,7 +38,7 @@ jobs:
         id: TRACKED_BRANCH_AND_TAG_CHECK
         run: |
           BRANCH=$(git rev-parse --abbrev-ref HEAD)
-          echo "BRANCH=$BRANCH" >> $GITHUB_OUTPUTS
+          echo "BRANCH=$BRANCH" >> $GITHUB_OUTPUT
           if git tag | grep -q "v${{ github.event.inputs.tagName }}-$BRANCH"; then
             echo "Tag v${{ github.event.inputs.tagName }}-$BRANCH already exists. Exiting without creating a new tag."
             exit 1
