@@ -1,6 +1,10 @@
 name: TEST
 run-name: Deployment number ${{ github.run_number }} initiated by ${{github.actor}}
 
+permissioms:
+  contents: write
+  id-token: write
+
 on:
   workflow_dispatch:
     inputs:
