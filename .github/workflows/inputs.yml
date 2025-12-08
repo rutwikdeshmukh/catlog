@@ -22,7 +22,7 @@ jobs:
       - name: PULL CODE
         uses: actions/checkout@v4
         with:
-          ref: dev
+          ref: temp
 
       - name: Create Tag
         if: ${{ github.event.inputs.createTag == 'true' && github.event.inputs.tagName != '' }}
