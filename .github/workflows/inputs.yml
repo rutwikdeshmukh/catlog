@@ -25,7 +25,7 @@ jobs:
           ref: dev
 
       - name: Create Tag
-        if: ${{ github.event.inputs.createTag == true && github.event.inputs.tagName != '' }}
+        if: ${{ github.event.inputs.createTag == 'true' && github.event.inputs.tagName != '' }}
         run: |
           BRANCH=$(git rev-parse --abbrev-ref HEAD)
           if git tag | grep -q "v${{ github.event.inputs.tagName }}-$BRANCH"; then
