@@ -1,0 +1,37 @@
+name: TAG BASED DEPLOYMENT
+run-name: Deployment number ${{ github.run_number }} initiated by ${{github.actor}}
+
+on:
+  workflow_dispatch:
+    inputs:
+      gitTagName:
+        required: true
+        description: 'Enter the git tag name to deploy from (e.g., v1.0.0-main)'
+
+jobs:
+  tag-based-deployment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: CHECK TAG VALIDITY
+        run: |
+          if git tag | grep -q "${{ github.event.inputs.gitTagName }}"; then
+            echo "TAG: ${{ github.event.inputs.gitTagName }} -- VALID"
+          else
+            echo "TAG: ${{ github.event.inputs.gitTagName }} does not exist. Exiting deployment."
+            exit 1
+          fi
+
+      - name: PULL CODE
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.gitTagName }}
+
+      - name: BRANCH CHECK
+        run: |
+          BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+      - name: CAT FILE
+        run: |
+          cat VERSION.txt
