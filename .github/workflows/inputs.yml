@@ -23,6 +23,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: temp
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Tag
         if: ${{ github.event.inputs.createTag == 'true' && github.event.inputs.tagName != '' }}
