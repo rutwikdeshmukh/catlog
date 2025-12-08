@@ -11,10 +11,10 @@ on:
         type: choice
         required: true
         description: 'Do you want to create a tag for the current state of the code after deployment?'
-        default: NO
+        default: "NO"
         options:
-          - YES
-          - NO
+          - "YES"
+          - "NO"
       tagName:
         description: Tag name to be created, follow semantic versioning - MAJOR.MINOR.PATCH e.g., 1.0.0 or 2.0.7 (required if Create Tag is 'YES' and should be unique)
       tagMessage:
