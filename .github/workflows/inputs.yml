@@ -3,19 +3,22 @@ run-name: Deployment number ${{ github.run_number }} initiated by ${{github.acto
 
 permissions:
   contents: write
-  id-token: write
 
 on:
   workflow_dispatch:
     inputs:
       createTag:
-        description: 'Do you want to create a tag for the current state of the code after deployment?'
+        type: choice
         required: true
-        type: boolean
+        description: 'Do you want to create a tag for the current state of the code after deployment?'
+        default: NO
+        options:
+          - YES
+          - NO
       tagName:
-        description: Tag name to be created in GitHub, follow semantic versioning - MAJOR.MINOR.PATCH e.g., 1.0.0 or 2.0.7 (required if Create Tag is 'true' and should be unique)
+        description: Tag name to be created, follow semantic versioning - MAJOR.MINOR.PATCH e.g., 1.0.0 or 2.0.7 (required if Create Tag is 'YES' and should be unique)
       tagMessage:
-        description: Tag message to associate with the tag (required if Create Tag is 'true')
+        description: Tag message to associate with the tag (required if Create Tag is 'YES')
 
 jobs:
   sync-build-deploy:
@@ -26,12 +29,12 @@ jobs:
       - name: PULL CODE
         uses: actions/checkout@v4
         with:
-          ref: temp
+          ref: main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Tag
-        if: ${{ github.event.inputs.createTag == 'true' && github.event.inputs.tagName != '' }}
+        if: ${{ github.event.inputs.createTag == 'YES' && github.event.inputs.tagName != '' }}
         run: |
           BRANCH=$(git rev-parse --abbrev-ref HEAD)
           if git tag | grep -q "v${{ github.event.inputs.tagName }}-$BRANCH"; then
@@ -40,7 +43,6 @@ jobs:
           fi
           git config --local user.name "${{ github.actor }}"
           git config --local user.email "${{ github.actor }}@users.noreply.github.com"
-          # git config --local user.email "${{ github.event.pusher.email }}" # If on.push pipeline triggers are enabled
           git tag -a "v${{ github.event.inputs.tagName }}-$BRANCH" -m "${{ github.event.inputs.tagMessage }}"
           git push origin "v${{ github.event.inputs.tagName }}-$BRANCH"
           git tag # To list tags and verify
