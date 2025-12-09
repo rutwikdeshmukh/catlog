@@ -1,0 +1,73 @@
+name: CREATE-TAG FROM-COMMIT-TITLE
+run-name: Deployment number ${{ github.run_number }} initiated by ${{github.actor}}
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+    inputs:
+      createTag:
+        type: choice
+        required: true
+        description: 'Do you want to create a tag for the current state of the code after deployment?'
+        default: "NO"
+        options:
+          - "YES"
+          - "NO"
+
+jobs:
+  CreateTagJob:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: PULL CODE
+        uses: actions/checkout@v4
+        with:
+          ref: main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get Last Commit Message
+        id: GET_LAST_COMMIT_MSG
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "COMMIT_MSG=$COMMIT_MSG" >> $GITHUB_OUTPUT
+          echo "Last Commit Message: $COMMIT_MSG"
+
+      - name: Extract VERSION from commit message
+        if: ${{ github.event.inputs.createTag == 'YES' &&  contains(steps.GET_LAST_COMMIT_MSG.outputs.COMMIT_MSG, '[CREATE-TAG-') && contains(steps.GET_LAST_COMMIT_MSG.outputs.COMMIT_MSG, ']') }}
+        id: GET_VERSION
+        run: |
+          MSG="${{ steps.GET_LAST_COMMIT_MSG.outputs.COMMIT_MSG }}"
+          # Extract between [CREATE-TAG- and ]
+          VERSION=$(echo "$MSG" | sed -n 's/.*\[CREATE-TAG-\(.*\)\].*/\1/p')
+          echo "VERSION=$VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Check Tag Uniqueness
+        if: ${{ github.event.inputs.createTag == 'YES' && steps.GET_VERSION.outcome == 'success' }}
+        id: TAG_CHECK
+        run: |
+          BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          echo "BRANCH=$BRANCH" >> $GITHUB_OUTPUT
+          git fetch --tags
+          if git tag --list | grep -q "${{ steps.GET_VERSION.outputs.VERSION }}-$BRANCH"; then
+            echo "Tag ${{ steps.GET_VERSION.outputs.VERSION }}-$BRANCH already exists. Exiting without creating a new tag."
+            exit 1
+          fi
+
+      - name: Configure User and Create Tag
+        if: ${{ github.event.inputs.createTag == 'YES' && steps.TAG_CHECK.outcome == 'success' }}
+        id: CREATE_TAG
+        run: |
+          git config --local user.name "${{ github.actor }}"
+          git config --local user.email "${{ github.actor }}@users.noreply.github.com"
+          git tag -a "${{ steps.GET_VERSION.outputs.VERSION }}-${{ steps.TAG_CHECK.outputs.BRANCH }}" -m "${{ steps.GET_LAST_COMMIT_MSG.outputs.COMMIT_MSG }}"
+          git push origin "${{ steps.GET_VERSION.outputs.VERSION }}-${{ steps.TAG_CHECK.outputs.BRANCH }}"
+
+      - name: Check All Tags Created
+        if: ${{ github.event.inputs.createTag == 'YES' && steps.CREATE_TAG.outcome == 'success'}}
+        run: |
+          git tag --list
