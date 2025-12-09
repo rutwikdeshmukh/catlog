@@ -33,7 +33,9 @@ jobs:
         id: GET_LAST_COMMIT_MSG
         run: |
           COMMIT_MSG=$(git log -1 --pretty=%B)
-          echo "COMMIT_MSG=$COMMIT_MSG" >> $GITHUB_OUTPUT
+          echo "COMMIT_MSG<<EOF" >> $GITHUB_OUTPUT
+          git log -1 --pretty=%B >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
           echo "Last Commit Message: $COMMIT_MSG"
 
       - name: Extract VERSION from commit message
